@@ -5,6 +5,8 @@ const data_ = [
 
     
     {'startTime':21, 'endTime':22, 'customerName':"Mr.D"},
+    {'startTime':23, 'endTime':24, 'customerName':"Mr.E"},
+
 ]
 
 
