@@ -4,7 +4,6 @@ const data_ = [
     {'startTime':10, 'endTime':12, 'customerName':"Mr.A"},
 
     
-    {'startTime':19, 'endTime':21, 'customerName':"Mr.C"},
     {'startTime':21, 'endTime':22, 'customerName':"Mr.D"},
 ]
 
