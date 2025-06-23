@@ -9,9 +9,6 @@ const data_ = [
     {'startTime':23, 'endTime':24, 'customerName':"Mr.F"},
     {'startTime':23, 'endTime':24, 'customerName':"Mr.G"},
 
-    {'startTime':23, 'endTime':24, 'customerName':"Mr.H"},
-    {'startTime':23, 'endTime':24, 'customerName':"Mr.J"},
-    {'startTime':23, 'endTime':24, 'customerName':"Mr.K"},
 
 ]
 
