@@ -1,0 +1,45 @@
+html {
+    box-sizing: border-box;   
+}
+
+.bookingCalendar {
+    display: flex;
+    justify-content: center;
+}
+
+.hour_line_court {
+    background-color: #ffffff;
+    border: 2px solid silver;
+    display: flex;
+    position: relative;
+    width: 600px;
+    height: 30px;
+    overflow: hidden;
+    margin-top:20px;
+}
+
+
+.hour_sub_block{
+    position: absolute;
+    height: 100%;
+    z-index: 1;
+    border: 1px solid gray;
+    text-align: center;
+    font-size:12px;
+    color:white;
+    font-weight: bold;
+}
+
+
+.hour_sub_block.overlap {
+    background-color: #ed4245 !important; /* Darker overlap color */
+}
+
+
+.time_mark{
+    position:absolute;
+    height: 100%;
+    z-index: 2;
+
+}
+
