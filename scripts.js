@@ -4,10 +4,7 @@ const data_ = [
     {'startTime':10, 'endTime':12, 'customerName':"Mr.A"},
 
     
-    {'startTime':21, 'endTime':22, 'customerName':"Mr.D"},
-    {'startTime':23, 'endTime':24, 'customerName':"Mr.E"},
     {'startTime':23, 'endTime':24, 'customerName':"Mr.F"},
-    {'startTime':23, 'endTime':24, 'customerName':"Mr.G"},
 
 
 ]
@@ -17,7 +14,7 @@ const currentCourt = document.querySelector(".hour_line_court")
 console.log(currentCourt.offsetWidth, currentCourt.offsetLeft)
 
 const startCalendar = 6
-const endCalendar  = 23
+const endCalendar  = 24
 
 
 function calculatePx(chosenObject, customerName,startHour, endHour){
