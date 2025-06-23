@@ -8,7 +8,7 @@ const data_ = [
     {'startTime':21, 'endTime':22, 'customerName':"Mr.D"},
 ]
 
-//  Added function
+
 const currentCourt = document.querySelector(".hour_line_court")
 console.log(currentCourt.offsetWidth, currentCourt.offsetLeft)
 
