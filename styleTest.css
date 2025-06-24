@@ -9,12 +9,6 @@ html {
 }
 
 
-.court-block{
-    display: flex;
-    position:relative;
-}
-
-
 .hour-bars {
     margin-top:90px;
     display: flex;
@@ -22,29 +16,29 @@ html {
     gap: 10px;
 }
 
-.hour-bars > div {
+
+.court-block{
+    display:flex;
+    position:relative;
+}
+
+.hour_container{
     display: flex;
 }
 
 .hour_sub_block {
     width: 90px;
     height: 30px;
-    border: 2px solid #ccc;
+    border: 1px solid #ccc;
     background-color: #f0f0f0;
     box-sizing: border-box;
     text-decoration: none;
     user-select: none;
-    z-index: 1;
     
-}
-
-.hour_sub_block.overlap {
-    background-color: #ed4245 !important; 
 }
 
 
 .timeInterval {
-    /* background-color: lightgray; */
     border: 1px solid grey;
     width: 90px;
     height: 30px;
@@ -60,3 +54,21 @@ html {
 
 
 
+.duration_container {
+    position: absolute;
+    height: 100%;
+}
+
+.duration_sub_block {
+    position: absolute;
+    box-sizing: border-box;
+    border: 2px solid gray;
+    height: 100%;
+    text-align: center;
+    font-weight: bold;
+    z-index: 1;
+}
+
+.duration_sub_block.overlap {
+    background-color: #ed4245 !important; 
+}

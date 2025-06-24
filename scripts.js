@@ -1,39 +1,45 @@
-const startCalendar = 6
+const startCalendar = 5
 const endCalendar  = 24
 
 
-createCourtBlock(3,startCalendar,endCalendar);
+createCourtBlock(4,startCalendar,endCalendar);
 
+
+// ------------------------------------------ Simulate API Data ------------------------------------------ //
 const data_ = [
-    {'startTime':7, 'endTime':9.5, 'customerName':"Mr.A"},
-    // {'startTime':12, 'endTime':13.5, 'customerName':"Mr.B"},
-    // {'startTime':10, 'endTime':12, 'customerName':"Mr.A"},
-    // {'startTime':23, 'endTime':24, 'customerName':"Mr.F"},
-]
-
-const currentCourt = document.querySelector(".court-block")
-console.log(currentCourt.offsetWidth, currentCourt.offsetLeft)
-
-
+    {'startTime':7.2, 'endTime':9.5, 'customerName':"Mr.A", 'courtName':'court_1'},
+    {'startTime':10, 'endTime':12, 'customerName':"Mr.A", 'courtName':'court_2'},
+    {'startTime':12, 'endTime':13.5, 'customerName':"Mr.B", 'courtName':'court_1'},
+    {'startTime':11, 'endTime':12.5, 'customerName':"Mr.Z", 'courtName':'court_1'},
+    {'startTime':15, 'endTime':16, 'customerName':"Mr.B", 'courtName':'court_1'},
+    {'startTime':23, 'endTime':24, 'customerName':"Mr.F", 'courtName':'court_2'},
+    {'startTime':23.5, 'endTime':24, 'customerName':"Mr.F", 'courtName':'court_1'},
+    ]
 
 
 data_.forEach( (item, idx) =>{
+    chosenCourt = document.querySelector(`div[class="duration_container ${item.courtName}"]`)
     start_time = item.startTime
     end_time = item.endTime
     customer_name = item.customerName
     indexPosition = start_time - startCalendar + 1
-    chosen_position = `.block_${indexPosition}`
-    const currentHourBlock = document.querySelector(chosen_position)
+
+    namedPosition = `duration_sub_block ${indexPosition}`
+    const currentHourBlock = document.createElement('div')
+    currentHourBlock.className = namedPosition
     
-    const hasOverlap = data_.some((other, j) => idx !== j && isOverlapping(item, other));
+    const hasOverlap = data_.some((other, j) => idx !== j && item.courtName === other.courtName && 
+                                                isOverlapping(item, other));
     
     calculatePx(currentHourBlock,  customer_name,start_time, end_time)
+    
     currentHourBlock.classList.toggle('overlap', hasOverlap);
     
+    chosenCourt.appendChild(currentHourBlock)
 })
 
 
-// -----------------------------------------------------------------------------------------//
+// ---------------------------------------------------------------------------------------------------------- //
 
 
 function createCourtBlock(courtCount, startHour, endHour){
@@ -52,11 +58,19 @@ function createCourtBlock(courtCount, startHour, endHour){
     }
     else{
         courtBlock.id = `court_num_${i}`
+
+        const hourBlockContainer = document.createElement('div')
+        const durationContainer = document.createElement('div')
+
+        hourBlockContainer.className = 'hour_container'
+        durationContainer.className = `duration_container court_${i}`
+        courtBlock.append(hourBlockContainer, durationContainer)
+
         for (let hour = startHour; hour < endHour; hour++) {
             const idx = hour - startHour  
             const hourBlock = document.createElement('div');
-            hourBlock.className = `hour_sub_block ${idx}`;
-            courtBlock.appendChild(hourBlock)}    
+            hourBlock.className = `hour_sub_block ${idx +1}`;
+            hourBlockContainer.appendChild(hourBlock)}    
         }
 
         hourBars.appendChild(courtBlock)}
@@ -64,13 +78,14 @@ function createCourtBlock(courtCount, startHour, endHour){
 
 
 function calculatePx(chosenObject, customerName,startHour, endHour){
+    const currentCourt = document.querySelector(".court-block")
     const pxPerDuration = currentCourt.offsetWidth / (60 * (endCalendar - startCalendar))
     const startWidth = (startHour - startCalendar) * 60 * pxPerDuration
 
     const currentDuration = endHour - startHour
     const currentDurationLength = (currentDuration * 60 * pxPerDuration)
     
-    Object.assign(chosenObject.style{
+    Object.assign(chosenObject.style, {
         left: `${startWidth}px`,
         width: `${currentDurationLength}px`,
         backgroundColor: "#50C89F",
@@ -82,20 +97,4 @@ function calculatePx(chosenObject, customerName,startHour, endHour){
 function isOverlapping(a, b) {
     return a.startTime < b.endTime && b.startTime < a.endTime;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
