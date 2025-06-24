@@ -70,7 +70,7 @@ function calculatePx(chosenObject, customerName,startHour, endHour){
     const currentDuration = endHour - startHour
     const currentDurationLength = (currentDuration * 60 * pxPerDuration)
     
-    Object.assign(chosenObject.style, {
+    Object.assign(chosenObject.style{
         left: `${startWidth}px`,
         width: `${currentDurationLength}px`,
         backgroundColor: "#50C89F",
