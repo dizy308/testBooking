@@ -14,17 +14,23 @@ const data_ = [
     {'startTime':15, 'endTime':16, 'customerName':"Mr.B", 'courtName':'court_1'},
     {'startTime':23, 'endTime':24, 'customerName':"Mr.F", 'courtName':'court_2'},
     {'startTime':23.5, 'endTime':24, 'customerName':"Mr.F", 'courtName':'court_1'},
+    
+    {'startTime':18, 'endTime':22, 'customerName':"Mr.M", 'courtName':'court_2'},
+    {'startTime':20.5, 'endTime':22, 'customerName':"Mr.M", 'courtName':'court_3'},
+    {'startTime':11, 'endTime':13, 'customerName':"Mr.Z", 'courtName':'court_3'},
+    {'startTime':14, 'endTime':15, 'customerName':"Mr.B", 'courtName':'court_3'},
+    {'startTime':18, 'endTime':22, 'customerName':"Mr.M", 'courtName':'court_4'},
     ]
 
 
 data_.forEach( (item, idx) =>{
-    chosenCourt = document.querySelector(`div[class="duration_container ${item.courtName}"]`)
+    chosenCourt = document.querySelector(`div[class="duration-container ${item.courtName}"]`)
     start_time = item.startTime
     end_time = item.endTime
     customer_name = item.customerName
     indexPosition = start_time - startCalendar + 1
 
-    namedPosition = `duration_sub_block ${indexPosition}`
+    namedPosition = `duration-sub-block ${indexPosition}`
     const currentHourBlock = document.createElement('div')
     currentHourBlock.className = namedPosition
     
@@ -33,7 +39,7 @@ data_.forEach( (item, idx) =>{
     
     calculatePx(currentHourBlock,  customer_name,start_time, end_time)
     
-    currentHourBlock.classList.toggle('overlap', hasOverlap);
+    currentHourBlock.classList.toggle('overlap-block', hasOverlap);
     
     chosenCourt.appendChild(currentHourBlock)
 })
@@ -43,7 +49,7 @@ data_.forEach( (item, idx) =>{
 
 
 function createCourtBlock(courtCount, startHour, endHour){
-    const hourBars = document.getElementById('hourBars');
+    const hourBars = document.querySelector('#hourBars');
     for (let i = 0; i <= courtCount; i++){
     const courtBlock = document.createElement('div')
     courtBlock.className = `court-block`
@@ -51,8 +57,8 @@ function createCourtBlock(courtCount, startHour, endHour){
     if (i === 0){
         for (let hour = startHour; hour < endHour; hour++) {
         const hourBlock = document.createElement('div');
-        hourBlock.textContent = `${String(hour).padStart(2,'0')}:00 - ${String(hour + 1).padStart(2,'0')}:00`
-        hourBlock.className = 'timeInterval'
+        hourBlock.textContent = `${String(hour).padStart(2,'0')} - ${String(hour + 1).padStart(2,'0')}`
+        hourBlock.className = 'time-interval'
         courtBlock.appendChild(hourBlock);
         }
     }
@@ -62,14 +68,14 @@ function createCourtBlock(courtCount, startHour, endHour){
         const hourBlockContainer = document.createElement('div')
         const durationContainer = document.createElement('div')
 
-        hourBlockContainer.className = 'hour_container'
-        durationContainer.className = `duration_container court_${i}`
+        hourBlockContainer.className = 'hour-container'
+        durationContainer.className = `duration-container court_${i}`
         courtBlock.append(hourBlockContainer, durationContainer)
 
         for (let hour = startHour; hour < endHour; hour++) {
             const idx = hour - startHour  
             const hourBlock = document.createElement('div');
-            hourBlock.className = `hour_sub_block ${idx +1}`;
+            hourBlock.className = `hour-sub-block ${idx +1}`;
             hourBlockContainer.appendChild(hourBlock)}    
         }
 
