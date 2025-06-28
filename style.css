@@ -1,22 +1,44 @@
 html {
   box-sizing: border-box;
+
 }
 *, *:before, *:after {
   box-sizing: inherit;
 }
 
+
+.container {
+    display: flex; 
+    width: 100%; 
+    min-height: 90vh;
+    gap:30px;
+}
+
+
+.container2 {
+    flex: 1;
+    max-height: 90vh;
+    background-color: #ccffcc;
+    padding: 20px;
+    text-align: center;
+}
+
+
+
 .calendar {
-    margin: 20px auto;
+    flex: 2; 
+    padding: 20px;
     display: flex;
+    background-color: lightblue;
     justify-content: center;
+    
 }
 
 
 #hourBars {
-    margin-top:90px;
+    margin-top:70px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     text-align: center;
     gap: 10px;
 }
@@ -25,6 +47,7 @@ html {
 .court-block{
     display:flex;
     position:relative;
+    align-items: flex-start;
 }
 
 .hour-container{
@@ -32,27 +55,23 @@ html {
     
 }
 
-.time-interval {
-    border: 1px solid grey;
+
+.court-number, .time-interval, .hour-sub-block {
+    border: 1px solid #ccc;
+    background-color: white;
     width: 60px;
     height: 30px;
-    margin-bottom: 10px;
     color: green;
     font-weight: bold;
-    font-size: 10px;
+    font-size: 70%;
     user-select: none;
 }
 
-
-.hour-sub-block {
-    width: 60px;
-    height: 30px;
-    border: 1px solid #ccc;
-    background-color: #f0f0f0;
-    text-decoration: none;
-    user-select: none;
-    
+.court-number{
+    color: red;
+    font-weight: bold;
 }
+
 
 
 .duration-container {

@@ -2,7 +2,7 @@ const startCalendar = 5
 const endCalendar  = 24
 
 
-createCourtBlock(4,startCalendar,endCalendar);
+createCourtBlock(3,startCalendar,endCalendar);
 
 
 // ------------------------------------------ Simulate API Data ------------------------------------------ //
@@ -55,11 +55,16 @@ function createCourtBlock(courtCount, startHour, endHour){
     courtBlock.className = `court-block`
 
     if (i === 0){
+        const courtNum = document.createElement('div')
+        courtNum.className = `court-number`
+        courtNum.textContent = 'COURT NUMBER'
+        courtBlock.append(courtNum)
+
         for (let hour = startHour; hour < endHour; hour++) {
         const hourBlock = document.createElement('div');
         hourBlock.textContent = `${String(hour).padStart(2,'0')} - ${String(hour + 1).padStart(2,'0')}`
         hourBlock.className = 'time-interval'
-        courtBlock.appendChild(hourBlock);
+        courtBlock.append(hourBlock);
         }
     }
     else{
@@ -67,10 +72,14 @@ function createCourtBlock(courtCount, startHour, endHour){
 
         const hourBlockContainer = document.createElement('div')
         const durationContainer = document.createElement('div')
+        const courtNum = document.createElement('div')
 
         hourBlockContainer.className = 'hour-container'
         durationContainer.className = `duration-container court_${i}`
-        courtBlock.append(hourBlockContainer, durationContainer)
+        courtNum.className = `court-number`
+        courtNum.textContent = `Court ${i}`
+
+        courtBlock.append(courtNum, hourBlockContainer, durationContainer)
 
         for (let hour = startHour; hour < endHour; hour++) {
             const idx = hour - startHour  
