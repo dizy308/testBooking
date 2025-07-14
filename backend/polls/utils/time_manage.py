@@ -65,6 +65,9 @@ class TimeManage:
 
 
 
+## ------------------------------------------------------------------------ ##
+
+
 def calculate_block_new(start_time, end_time):
     interval=1
     start_block = math.floor(start_time / interval) * interval
@@ -78,8 +81,30 @@ def calculate_block_new(start_time, end_time):
         
         end_temp = min(end_block, end_time)
 
-        block_list.append((start_temp, end_temp))
+        block_list.append((float(start_temp), float(end_temp)))
         start_block = end_temp
         idx+=1
         
     return block_list
+
+
+def find_free_slots_new(opening_time, closing_time, small_lines):
+    small_lines.sort()
+    current_position = opening_time
+    non_overlapping = []
+
+    for start, end in small_lines:
+        if start > current_position:
+            non_overlapping.append((current_position, start))
+        current_position = max(current_position, end)
+    
+    if current_position < closing_time:
+        non_overlapping.append((current_position, closing_time))
+    
+    uniform_blocks = []
+    for slot in non_overlapping:
+        blocks = calculate_block_new(slot)
+        uniform_blocks.extend(blocks)
+
+    
+    return uniform_blocks

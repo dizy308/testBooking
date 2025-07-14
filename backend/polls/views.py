@@ -30,16 +30,11 @@ class CourtCreateList(generics.ListCreateAPIView):
     serializer_class = CourtSerializer
 
 
-
-
 class CourtRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = CourtInfo.objects.all()
     serializer_class = CourtSerializer
     lookup_field = "pk"
     
-
-
-
 class BookingListCreate(generics.ListCreateAPIView):
     queryset = BookingInfo.objects.all()
     filter_backends = [DjangoFilterBackend]
@@ -58,15 +53,18 @@ class BookingRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = "pk"
     
     
-class CourtAvailabilityView(generics.ListAPIView):
 
+
+## -------------------------------------------------------------------------- ##
+    
+class BookingAvailabilityView(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         # Get court and validate date
         court = get_object_or_404(CourtInfo, id=self.kwargs['court_id'])
         filter_start_date = request.query_params.get('start_date', str('2025-07-01'))
         filter_end_date = request.query_params.get('end_date', str('2025-07-31'))
         
-        # Get all bookings for this court+date
+        # Get all bookings for date
         bookings = BookingInfo.objects.filter(
             court=court,
             booking_date__gte = filter_start_date,
@@ -98,22 +96,22 @@ class CourtAvailabilityView(generics.ListAPIView):
         })
 
 
-class FreeTimeIntervalAPI (APIView):
+class BookingAvailabilityIntervalView (APIView):
     def get(self, request, *args, **kwargs):
         # Get query parameters
-        court_id = request.query_params.get('court_id')
+        # court_id = request.query_params.get('court_id')
         start_date_str = request.query_params.get('start_date')
         end_date_str = request.query_params.get('end_date')
 
         # Validate required parameters
-        if not court_id or not start_date_str or not end_date_str:
+        # if not court_id or not start_date_str or not end_date_str:
+        if not start_date_str or not end_date_str:
             return Response(
                 {"error": "court_id, start_date, and end_date are required."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         bookings = BookingInfo.objects.filter(
-                    court=court_id,
                     booking_date__gte = start_date_str,
                     booking_date__lte = end_date_str
                     ).annotate(previous_end_time = Window(expression = Lag('end_time_decimal', default=None), partition_by=[F('court_id'), F('day_of_week')] \
