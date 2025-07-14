@@ -8,8 +8,6 @@ createCourtBlock(3,startCalendar,endCalendar);
 // ------------------------------------------ API DATAs ------------------------------------------ //
 function fetchDataAPI(input_date){
   const url = `http://127.0.0.1:8000/apipolls/booking/?booking_date=${input_date}`
-
-
   fetch(url)
     .then(response => {
       
@@ -48,25 +46,20 @@ function fetchDataAPI(input_date){
     .catch(error => {
       return Promise.reject(error);
     });
-
-
 }
-
-
 
 
 let refreshInterval = setInterval(() => {
   if (currentDate) {
     fetchDataAPI(currentDate);
   }
-}, 5000); // 5000 milliseconds = 5 seconds
+}, 5000);
 
 const dateFilter = document.getElementById('date-filter');
-  dateFilter.addEventListener('change', (e) => {
-  // Clear the previous interval
+
+dateFilter.addEventListener('change', (e) => {
   clearInterval(refreshInterval);
   
-  // Fetch data immediately
   fetchDataAPI(e.target.value);
   
   // Set up a new interval
@@ -74,8 +67,8 @@ const dateFilter = document.getElementById('date-filter');
     fetchDataAPI(e.target.value);
   }, 10000);
 });
-
 fetchDataAPI('2025-07-01')
+
 
 // ---------------------------------------------------------------------------------------------------------- //
 
@@ -142,7 +135,16 @@ function calculatePx(chosenObject, customerName,startHour, endHour){
 }
 
 function isOverlapping(booking1, booking2) {
-    const result = Number(booking1.start_time_decimal) < Number(booking2.end_time_decimal) && Number(booking2.start_time_decimal) < Number(booking1.end_time_decimal)
+    const result = Number(booking1.start_time_decimal) < Number(booking2.end_time_decimal) 
+                  && Number(booking2.start_time_decimal) < Number(booking1.end_time_decimal)
     return result;
 }
+
+
+
+
+
+//-------------------------------------Testing Area-------------------------------------//
+
+
 
