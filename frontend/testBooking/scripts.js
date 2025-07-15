@@ -2,7 +2,7 @@ const startCalendar = 5
 const endCalendar  = 24
 
 
-createCourtBlock(3,startCalendar,endCalendar);
+createCourtBlock(5,startCalendar,endCalendar);
 
         
 // ------------------------------------------ API DATAs ------------------------------------------ //
@@ -10,8 +10,6 @@ function fetchDataAPI(input_date){
   const url = `http://127.0.0.1:8000/apipolls/booking/?booking_date=${input_date}`
   fetch(url)
     .then(response => {
-      
-    
         document.querySelectorAll('.duration-container').forEach(container => {container.innerHTML = ''})
 
       if (!response.ok) {
@@ -20,59 +18,72 @@ function fetchDataAPI(input_date){
       return response.json();
     })
     .then(returnedData => {
-      returnedData.forEach((item,idx)=>{
-          chosenCourt = document.querySelector(`div[class="duration-container ${item.courtName}"]`)
-          start_time = item.start_time_decimal
-          end_time = item.end_time_decimal
-          customer_name = item.customer_num
-          // indexPosition = start_time - startCalendar + 1
-          indexPosition = start_time
+      const renderBookedBlocks = () => returnedData.forEach((item,idx)=>{
+        chosenCourt = document.querySelector(`div[class="duration-container ${item.courtName}"]`)
+        start_time = item.start_time_decimal
+        end_time = item.end_time_decimal
+        customer_name = item.customer_num
+        // indexPosition = start_time - startCalendar + 1
+        indexPosition = start_time
 
-          namedPosition = `duration-sub-block ${start_time}-${end_time}`
-          const currentHourBlock = document.createElement('div')
-          currentHourBlock.className = namedPosition
-          
-          const hasOverlap = returnedData.some((other, j) => idx !== j && item.courtName === other.courtName && 
-                                                      isOverlapping(item, other));
-          
-          calculatePx(currentHourBlock,  customer_name,start_time, end_time)
-          
-          currentHourBlock.classList.toggle('overlap-block', hasOverlap);
-          
-          chosenCourt.appendChild(currentHourBlock)
+        namedPosition = `duration-sub-block ${start_time}-${end_time}`
+        const currentHourBlock = document.createElement('div')
+        currentHourBlock.className = namedPosition
+        
+        const hasOverlap = returnedData.some((other, j) => idx !== j && item.courtName === other.courtName && 
+                                                    isOverlapping(item, other));
+        
+        calculatePx(currentHourBlock,  customer_name,start_time, end_time)
+        
+        currentHourBlock.classList.toggle('overlap-block', hasOverlap);
+        
+        chosenCourt.appendChild(currentHourBlock)
 
       })
+
+      const renderEmptyBlocks = () => returnedData.forEach((item,idx)=>{
+        console.log(item)
+      
+      
+      
+      })
+    
+    
+      return Promise.all([
+      Promise.resolve().then(renderBookedBlocks),
+      Promise.resolve().then(renderEmptyBlocks),
+    ]);
+
+
+    
     })
     .catch(error => {
       return Promise.reject(error);
     });
 }
 
-
+let currentDate = '2025-07-01'
 let refreshInterval = setInterval(() => {
   if (currentDate) {
     fetchDataAPI(currentDate);
   }
-}, 5000);
+}, 10000);
 
 const dateFilter = document.getElementById('date-filter');
-
 dateFilter.addEventListener('change', (e) => {
   clearInterval(refreshInterval);
   
   fetchDataAPI(e.target.value);
-  
-  // Set up a new interval
+
   refreshInterval = setInterval(() => {
-    fetchDataAPI(e.target.value);
-  }, 10000);
+    fetchDataAPI(e.target.value)}, 10000)
 });
-fetchDataAPI('2025-07-01')
+
+
+// fetchDataAPI('2025-07-01')
 
 
 // ---------------------------------------------------------------------------------------------------------- //
-
-
 function createCourtBlock(courtCount, startHour, endHour){
     const hourBars = document.querySelector('#hourBars');
     for (let i = 0; i <= courtCount; i++){
@@ -140,11 +151,4 @@ function isOverlapping(booking1, booking2) {
     return result;
 }
 
-
-
-
-
 //-------------------------------------Testing Area-------------------------------------//
-
-
-

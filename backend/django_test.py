@@ -82,20 +82,56 @@ bookings = BookingInfo.objects.filter(
     .annotate(court_start_time = F('court__start_hour'), court_end_time = F('court__end_hour')) \
     .values()
 
-    
-grouped_data = defaultdict(list)
-for element in bookings:
-    key = (element['court_id'], element['booking_date'])
-    booked_time_blocks = calculate_block_new(element['start_time_decimal'], element['end_time_decimal'])
-    grouped_data[key].extend(booked_time_blocks)
 
 
-
-for (court_id, booking_date), booked_time_blocks in grouped_data.items():
-    print(court_id, booking_date, booked_time_blocks)
-    
-
+## ---------------------------------------------------------------------------------------- ##  
 
     
+
     
+
+def calculate_block_new(start_time, end_time):
+    interval=1
+    start_block = math.floor(start_time / interval) * interval
+
+    block_list = []
+    idx = 0
+    while start_block < end_time:
+        start_temp = max(start_time, start_block)
+        end_block = start_block + interval
+        
+        
+        end_temp = min(end_block, end_time)
+
+        block_list.append((float(start_temp), float(end_temp)))
+        start_block = end_temp
+        idx+=1
+        
+    return block_list
+
+
+def find_free_slots_new(opening_time, closing_time, small_lines):
+    small_lines.sort()
+    current_position = opening_time
+    non_overlapping = []
+
+    for start, end in small_lines:
+        if start > current_position:
+            non_overlapping.append((current_position, start))
+        current_position = max(current_position, end)
     
+    if current_position < closing_time:
+        non_overlapping.append((current_position, closing_time))
+    
+    uniform_blocks = []
+    for slot in non_overlapping:
+        print(slot)
+        blocks = calculate_block_new(slot[0], slot[1])
+        uniform_blocks.extend(blocks)
+
+    
+    return uniform_blocks
+
+
+data_slot = find_free_slots_new(8,23, [])
+print(data_slot)
