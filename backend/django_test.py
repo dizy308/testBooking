@@ -15,7 +15,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cfghome.settings')
 django.setup()
 
 
-from polls.models import BookingInfo
+from polls.models import *
 
 
 def calculate_block(start_time, end_time):
@@ -74,22 +74,7 @@ def calculate_block(start_time, end_time):
 
 
 
-filter_date = '2025-07-01'
-
-bookings = BookingInfo.objects.filter(
-    booking_date = filter_date,
-    ) \
-    .annotate(court_start_time = F('court__start_hour'), court_end_time = F('court__end_hour')) \
-    .values()
-
-
-
 ## ---------------------------------------------------------------------------------------- ##  
-
-    
-
-    
-
 def calculate_block_new(start_time, end_time):
     interval=1
     start_block = math.floor(start_time / interval) * interval
@@ -125,13 +110,71 @@ def find_free_slots_new(opening_time, closing_time, small_lines):
     
     uniform_blocks = []
     for slot in non_overlapping:
-        print(slot)
         blocks = calculate_block_new(slot[0], slot[1])
         uniform_blocks.extend(blocks)
-
-    
     return uniform_blocks
 
 
-data_slot = find_free_slots_new(8,23, [])
-print(data_slot)
+# data_slot = find_free_slots_new(8,23, [(8,10), (11,12)])
+# print(data_slot)
+
+
+
+
+
+filter_date = '2025-07-01'
+
+courts = CourtInfo.objects.all()
+bookings = BookingInfo.objects.filter(booking_date = filter_date).select_related('court')
+
+booked_slots = defaultdict(list) 
+booked_details = defaultdict(list)  
+
+for booking in bookings:
+    time_interval = (float(booking.start_time_decimal), float(booking.end_time_decimal))
+    booked_slots[booking.court_id].append(time_interval)
+    
+    booked_details[booking.court_id].append({
+            'start': float(booking.start_time_decimal),
+            'end': float(booking.end_time_decimal),
+            'customer_id': booking.customer_num
+        })
+
+
+
+total_slots = []
+for court in courts:
+    booked_list = booked_slots.get(court.id,[])
+    start_time = float(court.start_hour)
+    end_time = float(court.end_hour)
+    free_slot = find_free_slots_new(start_time, end_time, booked_list)
+
+    booked_detail = [
+            {
+                'start': b.start_time_decimal,
+                'end': b.end_time_decimal,
+                'customer_id': b.customer_num
+            }
+            for b in bookings if b.court_id == court.id
+        ] 
+    
+    total_slots.append({
+        "court_id": court.id,
+        "booked_slot":booked_details[court.id],
+        "free_slot": free_slot,
+        
+        }
+        
+    )
+
+
+print(total_slots)
+
+    
+    
+    
+
+
+    
+
+

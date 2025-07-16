@@ -65,9 +65,7 @@ class TimeManage:
 
 
 
-## ------------------------------------------------------------------------ ##
-
-
+## --------------------------------------------------------------------------------- ##
 def calculate_block_new(start_time, end_time):
     interval=1
     start_block = math.floor(start_time / interval) * interval
@@ -77,8 +75,6 @@ def calculate_block_new(start_time, end_time):
     while start_block < end_time:
         start_temp = max(start_time, start_block)
         end_block = start_block + interval
-        
-        
         end_temp = min(end_block, end_time)
 
         block_list.append((float(start_temp), float(end_temp)))

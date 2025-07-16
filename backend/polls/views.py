@@ -60,27 +60,25 @@ class BookingRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
 class BookingAvailabilityView(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         # Get court and validate date
-        court = get_object_or_404(CourtInfo, id=self.kwargs['court_id'])
-        filter_start_date = request.query_params.get('start_date', str('2025-07-01'))
-        filter_end_date = request.query_params.get('end_date', str('2025-07-31'))
+        filter_date = request.query_params.get('start_date', str('2025-07-01'))
         
         # Get all bookings for date
         bookings = BookingInfo.objects.filter(
-            court=court,
-            booking_date__gte = filter_start_date,
-            booking_date__lte = filter_end_date
-        )
+            booking_date = filter_date)
         
         # Convert bookings to decimal time slots
-        booked_slots = [
-            (float(b.start_time_decimal), float(b.end_time_decimal))
-            for b in bookings
-        ]
+        try:
+            booked_slots = [
+                (float(b.start_time_decimal), float(b.end_time_decimal))
+                for b in bookings
+            ]
+        except:
+            booked_slots = []
         
         # Calculate free slots
         time_manager = TimeManage(
-            opening=float(court.start_hour),
-            closing=float(court.end_hour),
+            opening=float(6),
+            closing=float(23),
             interval=1)
         free_slots = time_manager.find_free_slots(booked_slots)
         uniform_slots = time_manager.uniform_free_slots()
@@ -88,9 +86,7 @@ class BookingAvailabilityView(generics.ListAPIView):
         # Format response
         
         return Response({
-            "court": court.court_name,
-            "date_range_start":filter_start_date,
-            "date_range_end":filter_end_date,
+            "date": filter_date,
             "booked_slots":booked_slots,
             "free_slots": uniform_slots,
         })
