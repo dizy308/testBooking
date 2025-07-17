@@ -44,8 +44,6 @@ function fetchDataAPI(input_date){
       const renderEmptyBlocks = () => returnedData.forEach((item,idx)=>{
         console.log(item)
       
-      
-      
       })
     
     
@@ -80,7 +78,7 @@ dateFilter.addEventListener('change', (e) => {
 });
 
 
-// fetchDataAPI('2025-07-01')
+
 
 
 // ---------------------------------------------------------------------------------------------------------- //
@@ -152,3 +150,7 @@ function isOverlapping(booking1, booking2) {
 }
 
 //-------------------------------------Testing Area-------------------------------------//
+
+
+
+

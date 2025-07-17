@@ -35,16 +35,6 @@ class CourtRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CourtSerializer
     lookup_field = "pk"
     
-class BookingListCreate(generics.ListCreateAPIView):
-    queryset = BookingInfo.objects.all()
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['booking_date']
-    def get_serializer_class(self):
-        if self.request.method == "GET":
-
-            return BookingListSerializer
-        return BookingSerializer
-
 
 
 class BookingRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
@@ -55,52 +45,61 @@ class BookingRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     
 
 
+class BookingListCreate(generics.ListCreateAPIView):
+    queryset = BookingInfo.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['booking_date']
+    def get_serializer_class(self):
+        if self.request.method == "GET":
+
+            return BookingListSerializer
+        return BookingSerializer
 ## -------------------------------------------------------------------------- ##
     
-class BookingAvailabilityView(generics.ListAPIView):
-    def list(self, request, *args, **kwargs):
+class BookingAvailabilityView(APIView):
+    def get(self, request, *args, **kwargs):
         # Get court and validate date
-        filter_date = request.query_params.get('start_date', str('2025-07-01'))
+        input_date = request.query_params.get('date', str('2025-07-01'))
+        courts = CourtInfo.objects.all()
+        bookings = BookingInfo.objects.filter(booking_date = input_date).select_related('court')
+
+        booked_slots = defaultdict(list) 
+        booked_details = defaultdict(list)  
+
+        for booking in bookings:
+            time_interval = (float(booking.start_time_decimal), float(booking.end_time_decimal))
+            booked_slots[booking.court_id].append(time_interval)
+            
+            booked_details[booking.court_id].append({
+                    'start_time': float(booking.start_time_decimal),
+                    'end_time': float(booking.end_time_decimal),
+                    'customer_id': booking.customer_num
+                })
+
         
-        # Get all bookings for date
-        bookings = BookingInfo.objects.filter(
-            booking_date = filter_date)
+        total_slots = []
+        for court in courts:
+            booked_list = booked_slots.get(court.id,[])
+            start_time = float(court.start_hour)
+            end_time = float(court.end_hour)
+            free_slot = find_free_slots_new(start_time, end_time, booked_list)
+            
+            total_slots.append({
+                "court_id": court.id,
+                "booked_slot":booked_details[court.id],
+                "free_slot": free_slot,
+                })
         
-        # Convert bookings to decimal time slots
-        try:
-            booked_slots = [
-                (float(b.start_time_decimal), float(b.end_time_decimal))
-                for b in bookings
-            ]
-        except:
-            booked_slots = []
-        
-        # Calculate free slots
-        time_manager = TimeManage(
-            opening=float(6),
-            closing=float(23),
-            interval=1)
-        free_slots = time_manager.find_free_slots(booked_slots)
-        uniform_slots = time_manager.uniform_free_slots()
-        
-        # Format response
-        
-        return Response({
-            "date": filter_date,
-            "booked_slots":booked_slots,
-            "free_slots": uniform_slots,
-        })
+        serializer = FreeTimeSlotSerializer(total_slots, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class BookingAvailabilityIntervalView (APIView):
     def get(self, request, *args, **kwargs):
         # Get query parameters
-        # court_id = request.query_params.get('court_id')
         start_date_str = request.query_params.get('start_date')
         end_date_str = request.query_params.get('end_date')
 
-        # Validate required parameters
-        # if not court_id or not start_date_str or not end_date_str:
         if not start_date_str or not end_date_str:
             return Response(
                 {"error": "court_id, start_date, and end_date are required."},
@@ -139,7 +138,7 @@ class BookingAvailabilityIntervalView (APIView):
             for (court_id, day_of_week), time_blocks in grouped_data.items()
         ]
 
-        serializer = FreeTimeSlotSerializer(data, many=True)
+        serializer = FreeTimeSlotIntervalSerializer(data, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     

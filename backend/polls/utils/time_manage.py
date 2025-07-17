@@ -75,6 +75,8 @@ def calculate_block_new(start_time, end_time):
     while start_block < end_time:
         start_temp = max(start_time, start_block)
         end_block = start_block + interval
+        
+        
         end_temp = min(end_block, end_time)
 
         block_list.append((float(start_temp), float(end_temp)))
@@ -99,8 +101,6 @@ def find_free_slots_new(opening_time, closing_time, small_lines):
     
     uniform_blocks = []
     for slot in non_overlapping:
-        blocks = calculate_block_new(slot)
+        blocks = calculate_block_new(slot[0], slot[1])
         uniform_blocks.extend(blocks)
-
-    
     return uniform_blocks
