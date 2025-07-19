@@ -16,13 +16,10 @@ html {
 
 }
 
-
-
-
 .calendar {
     padding: 20px;
     display: flex;
-    background-color: lightblue;
+    background-color: #b2eefb;
     justify-content: center;
     
 }
@@ -73,10 +70,10 @@ html {
     height: 100%;
 }
 
-.duration-sub-block {
+.duration-sub-block{
     height: 100%;
     position: absolute;
-    border: 2px solid gray;
+    /* border: 2px solid gray; */
     color:white;
     font-weight: bold;
     font-size: 12px;
@@ -86,6 +83,16 @@ html {
 
 .duration-sub-block.overlap-block {
     background-color: red !important; 
+}
+
+.duration-sub-block-empty {
+    height: 100%;
+    position: absolute;
+    z-index: 1;
+ }
+
+.selected-slot {
+    background-color: rgba(255, 255, 0, 0.5); 
 }
 
 

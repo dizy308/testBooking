@@ -71,6 +71,7 @@ class BookingAvailabilityView(APIView):
             booked_slots[booking.court_id].append(time_interval)
             
             booked_details[booking.court_id].append({
+                    'booking_id': float(booking.id),
                     'start_time': float(booking.start_time_decimal),
                     'end_time': float(booking.end_time_decimal),
                     'customer_id': booking.customer_num

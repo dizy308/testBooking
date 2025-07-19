@@ -1,87 +1,132 @@
-const startCalendar = 5
-const endCalendar  = 24
+const startCalendar = 6
+const endCalendar  = 23
 
 
-createCourtBlock(5,startCalendar,endCalendar);
+createCourtBlock(3,startCalendar,endCalendar);
 
         
 // ------------------------------------------ API DATAs ------------------------------------------ //
+const selectedSlots = {};
+
 function fetchDataAPI(input_date){
-  const url = `http://127.0.0.1:8000/apipolls/booking/?booking_date=${input_date}`
+  const url = `http://127.0.0.1:8000/apipolls/booking/freeslot?date=${input_date}`
   fetch(url)
     .then(response => {
         document.querySelectorAll('.duration-container').forEach(container => {container.innerHTML = ''})
+        Object.keys(selectedSlots).forEach(key => delete selectedSlots[key])
 
-      if (!response.ok) {
-        return Promise.reject(new Error(`HTTP error! status: ${response.status}`));
-      }
-      return response.json();
+        if (!response.ok) {
+          return Promise.reject(new Error(`HTTP error! status: ${response.status}`));
+        }
+        return response.json();
     })
-    .then(returnedData => {
-      const renderBookedBlocks = () => returnedData.forEach((item,idx)=>{
-        chosenCourt = document.querySelector(`div[class="duration-container ${item.courtName}"]`)
-        start_time = item.start_time_decimal
-        end_time = item.end_time_decimal
-        customer_name = item.customer_num
-        // indexPosition = start_time - startCalendar + 1
-        indexPosition = start_time
+    .then(
+        returnedData => returnedData.forEach((item, idx)=>{
+        const booked_slots = item.booked_slot
+        const empty_slots = item.free_slot
+        const current_court = item.court_id
 
-        namedPosition = `duration-sub-block ${start_time}-${end_time}`
-        const currentHourBlock = document.createElement('div')
-        currentHourBlock.className = namedPosition
-        
-        const hasOverlap = returnedData.some((other, j) => idx !== j && item.courtName === other.courtName && 
-                                                    isOverlapping(item, other));
-        
-        calculatePx(currentHourBlock,  customer_name,start_time, end_time)
-        
-        currentHourBlock.classList.toggle('overlap-block', hasOverlap);
-        
-        chosenCourt.appendChild(currentHourBlock)
+        const current_court_name = `Court ${current_court}`
 
-      })
+        const job1 = () => {
+          booked_slots.forEach((elementBooked, idx) => {
+            const chosenCourt = document.querySelector(`div[class="duration-container court_${current_court}"]`)
+            const start_time = elementBooked.start_time
+            const end_time = elementBooked.end_time
+            const customer_name = elementBooked.customer_id
+            const booking_id = elementBooked.booking_id
+            const indexPosition = start_time
 
-      const renderEmptyBlocks = () => returnedData.forEach((item,idx)=>{
-        console.log(item)
-      
-      })
-    
-    
-      return Promise.all([
-      Promise.resolve().then(renderBookedBlocks),
-      Promise.resolve().then(renderEmptyBlocks),
-    ]);
+            namedPosition = `duration-sub-block ${start_time}-${end_time}`
+            const currentHourBlock = document.createElement('div')
+            currentHourBlock.className = namedPosition
+            
+            calculatePx(currentHourBlock,customer_name,start_time, end_time)
+            
+            currentHourBlock.addEventListener('click', () => {alert(`BookingID ${booking_id} from ${start_time} to ${end_time}`)})
+            
+            chosenCourt.appendChild(currentHourBlock)
+            
+          })}
+        const job2 = () => {
+          empty_slots.forEach((emptySlot, idx) =>{
+            const chosenCourt_empty = document.querySelector(`div[class="duration-container court_${current_court}"]`)
+            const start_time_empty = emptySlot[0]
+            const end_time_empty = emptySlot[1]
 
+            
+            
+            namedPositionEmpty = `duration-sub-block-empty ${start_time_empty}-${end_time_empty}`
+            const currentHourBlockEmpty = document.createElement('div')
+            currentHourBlockEmpty.className = namedPositionEmpty
 
-    
-    })
+            calculatePxEmpty(currentHourBlockEmpty,start_time_empty, end_time_empty)
+
+            currentHourBlockEmpty.addEventListener('click', () => {
+              if (!selectedSlots[current_court_name]) {selectedSlots[current_court_name] = []}
+              
+              
+              // Toggle selected state
+              if (currentHourBlockEmpty.classList.contains('selected-slot')) {
+                console.log(`Removed free time at court ${current_court} from ${start_time_empty} to ${end_time_empty}`);
+                currentHourBlockEmpty.classList.remove('selected-slot');
+                
+                clickedPosition = selectedSlots[current_court_name].findIndex(slot => slot.start_time === start_time_empty && slot.end_time === end_time_empty)
+                selectedSlots[current_court_name].splice(clickedPosition)
+
+              } else {
+                console.log(`Selected free time at court ${current_court} from ${start_time_empty} to ${end_time_empty}`)
+                currentHourBlockEmpty.classList.add('selected-slot')
+                
+                
+                selectedSlots[current_court_name].push({
+                          start_time: start_time_empty,
+                          end_time: end_time_empty,
+                          court_id: current_court});
+                }
+            });
+            
+          chosenCourt_empty.appendChild(currentHourBlockEmpty);
+
+        })}
+        return Promise.all([job1(), job2()])
+    }))
     .catch(error => {
       return Promise.reject(error);
     });
-}
-
-let currentDate = '2025-07-01'
-let refreshInterval = setInterval(() => {
-  if (currentDate) {
-    fetchDataAPI(currentDate);
   }
-}, 10000);
+
 
 const dateFilter = document.getElementById('date-filter');
 dateFilter.addEventListener('change', (e) => {
-  clearInterval(refreshInterval);
-  
   fetchDataAPI(e.target.value);
 
-  refreshInterval = setInterval(() => {
-    fetchDataAPI(e.target.value)}, 10000)
+});
+
+
+document.getElementById('confirm-booking').addEventListener('click', () => {
+  let receivedData = []
+  const currentDate = dateFilter.value;
+
+  Object.entries(selectedSlots).forEach(([key,value]) => {
+    if (value.length === 0){
+          // pass
+    }
+    else{
+      const newValue = mergeAdjacentTimeSlots(value)
+      newValue.forEach(item => {
+          receivedData.push([`Booked Court ${item.court_id}: ${item.start_time} - ${item.end_time}`])
+      })
+    }
+  })
+  console.log(currentDate, receivedData)
+
 });
 
 
 
 
-
-// ---------------------------------------------------------------------------------------------------------- //
+// ----------------------------------------------------------------------------------------------------------------------------------------- //
 function createCourtBlock(courtCount, startHour, endHour){
     const hourBars = document.querySelector('#hourBars');
     for (let i = 0; i <= courtCount; i++){
@@ -137,19 +182,58 @@ function calculatePx(chosenObject, customerName,startHour, endHour){
     Object.assign(chosenObject.style, {
         left: `${startWidth}px`,
         width: `${currentDurationLength}px`,
-        backgroundColor: "#50C89F",
+        backgroundColor: "#ed6327",
     });
     chosenObject.textContent = customerName
     
 }
 
+function calculatePxEmpty(chosenObject,startHour, endHour){
+    const currentCourt = document.querySelector(".hour-container")
+    const pxPerDuration = currentCourt.offsetWidth / (60 * (endCalendar - startCalendar))
+    const startWidth = (startHour - startCalendar) * 60 * pxPerDuration + currentCourt.offsetLeft
+
+    const currentDuration = endHour - startHour
+    const currentDurationLength = (currentDuration * 60 * pxPerDuration)
+    
+    Object.assign(chosenObject.style, {
+        left: `${startWidth}px`,
+        width: `${currentDurationLength}px`
+    });  
+}
+
 function isOverlapping(booking1, booking2) {
-    const result = Number(booking1.start_time_decimal) < Number(booking2.end_time_decimal) 
-                  && Number(booking2.start_time_decimal) < Number(booking1.end_time_decimal)
+    const result = Number(booking1.start_time) < Number(booking2.end_time) 
+                  && Number(booking2.start_time) < Number(booking1.end_time)
+                
     return result;
 }
 
-//-------------------------------------Testing Area-------------------------------------//
+
+function mergeAdjacentTimeSlots(timeSlots) {
+  return timeSlots.reduce((accumulator, currentValue) => {
+    const previousValue = accumulator[accumulator.length - 1];
+    
+    if (previousValue !== undefined && previousValue.end_time === currentValue.start_time) {
+      // Merge adjacent time slots
+      const mergedSlot = {
+        start_time: previousValue.start_time,
+        end_time: currentValue.end_time,
+        court_id: currentValue.court_id
+      };
+      accumulator.pop();
+      return accumulator.concat(mergedSlot);
+    } else {
+      // Add the current time slot as is
+      return accumulator.concat({
+        start_time: currentValue.start_time,
+        end_time: currentValue.end_time,
+        court_id: currentValue.court_id
+      });
+    }
+  }, []);
+}
+// ----------------------------------------------------------------------------------------------------------------------------------------- //
 
 
 
