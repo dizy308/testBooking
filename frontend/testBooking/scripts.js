@@ -53,8 +53,6 @@ function fetchDataAPI(input_date){
             const chosenCourt_empty = document.querySelector(`div[class="duration-container court_${current_court}"]`)
             const start_time_empty = emptySlot[0]
             const end_time_empty = emptySlot[1]
-
-            
             
             namedPositionEmpty = `duration-sub-block-empty ${start_time_empty}-${end_time_empty}`
             const currentHourBlockEmpty = document.createElement('div')
@@ -65,20 +63,15 @@ function fetchDataAPI(input_date){
             currentHourBlockEmpty.addEventListener('click', () => {
               if (!selectedSlots[current_court_name]) {selectedSlots[current_court_name] = []}
               
-              
               // Toggle selected state
               if (currentHourBlockEmpty.classList.contains('selected-slot')) {
-                console.log(`Removed free time at court ${current_court} from ${start_time_empty} to ${end_time_empty}`);
                 currentHourBlockEmpty.classList.remove('selected-slot');
                 
                 clickedPosition = selectedSlots[current_court_name].findIndex(slot => slot.start_time === start_time_empty && slot.end_time === end_time_empty)
                 selectedSlots[current_court_name].splice(clickedPosition)
 
               } else {
-                console.log(`Selected free time at court ${current_court} from ${start_time_empty} to ${end_time_empty}`)
                 currentHourBlockEmpty.classList.add('selected-slot')
-                
-                
                 selectedSlots[current_court_name].push({
                           start_time: start_time_empty,
                           end_time: end_time_empty,
@@ -103,27 +96,64 @@ dateFilter.addEventListener('change', (e) => {
 
 });
 
+const popupBox = document.querySelector('.popup-box')
+const confirmBooking = document.getElementById('confirm-booking')
 
-document.getElementById('confirm-booking').addEventListener('click', () => {
-  let receivedData = []
-  const currentDate = dateFilter.value;
-
+let receivedData = []
+confirmBooking.addEventListener('click', () => {
+  receivedData = []
   Object.entries(selectedSlots).forEach(([key,value]) => {
-    if (value.length === 0){
-          // pass
-    }
-    else{
+    if (value.length === 0){}
+    else {
       const newValue = mergeAdjacentTimeSlots(value)
       newValue.forEach(item => {
-          receivedData.push([`Booked Court ${item.court_id}: ${item.start_time} - ${item.end_time}`])
+        dataFrag = {"booking_date": dateFilter.value, "customer_num":"STAFF",
+                    "start_time":convertToTime(item.start_time),
+                    "end_time":convertToTime(item.end_time),
+                    "court":item.court_id}
+
+        console.log(dataFrag)
+        receivedData.push(dataFrag)
       })
     }
   })
-  console.log(currentDate, receivedData)
-
+  if(receivedData.length === 0){
+    alert('Please book a court')
+  }
+  else{
+    popupBox.classList.add('open-popup');
+    document.querySelector('.calendar').classList.add('disabled');
+    
+  }
 });
 
 
+const confirmSchedule = document.querySelector('#confirm-schedule')
+const cancelSchedule = document.querySelector('#cancel-schedule')
+
+confirmSchedule.addEventListener('click', ()=> {
+  let currentDate = dateFilter.value
+  popupBox.classList.remove('open-popup')
+  document.querySelector('.calendar').classList.remove('disabled');
+  
+  const bookingPromises = receivedData.map(item => sendBookingRequest(item));
+
+  Promise.all(bookingPromises)
+  .then(() => {
+    // setTimeout(() => fetchDataAPI(currentDate), 300);
+    fetchDataAPI(currentDate)
+  })
+  .catch(error => {
+    console.error('Booking failed:', error);
+    alert('Some bookings failed. Please try again.');
+  });
+
+})
+
+cancelSchedule.addEventListener('click', ()=> {
+  popupBox.classList.remove('open-popup')
+  document.querySelector('.calendar').classList.remove('disabled');
+})
 
 
 // ----------------------------------------------------------------------------------------------------------------------------------------- //
@@ -211,11 +241,11 @@ function isOverlapping(booking1, booking2) {
 
 
 function mergeAdjacentTimeSlots(timeSlots) {
-  return timeSlots.reduce((accumulator, currentValue) => {
-    const previousValue = accumulator[accumulator.length - 1];
+  const sortedTimeSlots = timeSlots.sort((a, b) => a.start_time - b.start_time);
+  return sortedTimeSlots.reduce((accumulator, currentValue) => {
+  const previousValue = accumulator[accumulator.length - 1];
     
-    if (previousValue !== undefined && previousValue.end_time === currentValue.start_time) {
-      // Merge adjacent time slots
+  if (previousValue !== undefined && previousValue.end_time === currentValue.start_time) {
       const mergedSlot = {
         start_time: previousValue.start_time,
         end_time: currentValue.end_time,
@@ -233,8 +263,31 @@ function mergeAdjacentTimeSlots(timeSlots) {
     }
   }, []);
 }
+
+
+function sendBookingRequest(data) {
+    return fetch('http://127.0.0.1:8000/apipolls/booking/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Success:', data);
+        return data; // Ensure the data propagates
+    });
+    // Remove the catch here - let the caller handle errors
+}
+
+function convertToTime(inputTime){
+	let hour = parseInt(inputTime);
+	let minute = Math.round((inputTime % 1) * 60 ) ;
+	return `${hour}:${minute}`
+	}
+
 // ----------------------------------------------------------------------------------------------------------------------------------------- //
-
-
-
-

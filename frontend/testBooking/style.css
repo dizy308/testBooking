@@ -8,22 +8,22 @@ html {
 
 
 .container {
-    display: flex; 
     width: 100%; 
-    min-height: 90vh;
+    height: 100vh;
+    background-color: lightseagreen;
     gap:30px;
-    align-items: flex-start; 
 
 }
 
 .calendar {
     padding: 20px;
     display: flex;
-    background-color: #b2eefb;
     justify-content: center;
     
 }
-
+.calendar.disabled {
+    pointer-events: none;
+}
 
 #hourBars {
     margin-top:70px;
@@ -33,17 +33,9 @@ html {
     gap: 5px;
 }
 
-
-.court-block{
+.court-block, .hour-container{
     display:flex;
     position:relative;
-    align-items: flex-start;
-}
-
-.hour-container{
-    display: flex;
-    position:relative;
-    
 }
 
 
@@ -73,7 +65,7 @@ html {
 .duration-sub-block{
     height: 100%;
     position: absolute;
-    /* border: 2px solid gray; */
+    cursor: pointer;
     color:white;
     font-weight: bold;
     font-size: 12px;
@@ -100,4 +92,90 @@ html {
     width: 100%;
     margin-bottom: 30px;
     text-align: left;
+}
+
+
+.container-popup{
+    width: 100%;
+    height: 100vh;
+    background-color: #3c5077;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#confirm-booking{
+    padding:5px 30px;
+    background-color: green;
+    border: 0px;
+    outline: none;
+    cursor: pointer;
+    font-size: 20px;
+    color: white;
+    border-radius: 5px;
+}
+
+
+
+/* POP UP BOX AREA */
+.popup-box {
+    width: 320px;
+    padding: 25px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: Arial, sans-serif;
+    visibility: hidden;
+}
+
+.open-popup{
+    visibility: visible;
+}
+
+.input-group {
+    margin-bottom: 25px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.button-area {
+    display: flex;
+    gap: 12px;
+}
+
+.button-area button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#confirm-schedule {
+    background: #2e8b57;
+    color: white;
+}
+
+#cancel-schedule {
+    background: #f5f5f5;
+    color: #555;
+    border: 1px solid #ddd !important;
 }

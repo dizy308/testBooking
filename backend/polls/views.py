@@ -7,6 +7,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from collections import defaultdict
 
+from django.db import transaction
 from django.db.models import F, Window, Case, When, Value, FloatField, Min, Max
 from django.db.models.functions import Lag, Lead
 
@@ -49,9 +50,13 @@ class BookingListCreate(generics.ListCreateAPIView):
     queryset = BookingInfo.objects.all()
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['booking_date']
+
+    # @transaction.atomic
+    # def create(self, request, *args, **kwargs):
+    #     return super().create(request, *args, **kwargs)
+
     def get_serializer_class(self):
         if self.request.method == "GET":
-
             return BookingListSerializer
         return BookingSerializer
 ## -------------------------------------------------------------------------- ##
