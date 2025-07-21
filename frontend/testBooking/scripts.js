@@ -2,7 +2,7 @@ const startCalendar = 6
 const endCalendar  = 23
 
 
-createCourtBlock(3,startCalendar,endCalendar);
+createCourtBlock(5,startCalendar,endCalendar);
 
         
 // ------------------------------------------ API DATAs ------------------------------------------ //
@@ -39,6 +39,7 @@ function fetchDataAPI(input_date){
 
             namedPosition = `duration-sub-block ${start_time}-${end_time}`
             const currentHourBlock = document.createElement('div')
+
             currentHourBlock.className = namedPosition
             
             calculatePx(currentHourBlock,customer_name,start_time, end_time)
@@ -46,8 +47,10 @@ function fetchDataAPI(input_date){
             currentHourBlock.addEventListener('click', () => {
               popupBoxModify.classList.add('open-popup')
               document.querySelector('.calendar').classList.add('disabled');
+              popupBoxModify.dataset.currentBookingID = elementBooked.booking_id;
+
             })
-            
+
             chosenCourt.appendChild(currentHourBlock)
             
           })}
@@ -99,7 +102,9 @@ const popupBoxModify = document.querySelector('.popup-box-modify');
 const confirmBooking = document.getElementById('confirm-booking');
 const confirmSchedule = document.querySelector('#confirm-schedule')
 const cancelSchedule = document.querySelector('#cancel-schedule')
+const deleteButton = document.querySelector('.delete-button')
 const closePopup = document.querySelector('.close-icon')
+
 
 const nameInput = document.querySelector("#fname")
 const dateFilter = document.getElementById('date-filter');
@@ -168,6 +173,25 @@ confirmSchedule.addEventListener('click', ()=> {
 cancelSchedule.addEventListener('click', () => closeModal(popupBoxBooking));
 closePopup.addEventListener('click', () => closeModal(popupBoxModify));
 
+
+deleteButton.addEventListener('click', () => {
+  const bookingId = popupBoxModify.dataset.currentBookingID;
+  let currentDate = dateFilter.value
+
+  deleteBookingRequest(bookingId)
+  .then(response => {
+    if (response.ok) {
+      closeModal(popupBoxModify);
+      return fetchDataAPI(currentDate);
+    } else {
+      alert('Failed to delete booking.');
+    }
+  })
+  .catch(error => {
+    alert('Error deleting booking: ' + error);
+  });
+
+})
 
 // ----------------------------------------------------------------------------------------------------------------------------------------- //
 // ----------------------------------------------------------------------------------------------------------------------------------------- //
@@ -300,10 +324,28 @@ function sendBookingRequest(data) {
         return response.json();
     })
     .then(data => {
-        console.log('Success:', data);
         return data;
     });
 }
+
+
+function deleteBookingRequest(booking_id) {
+    return fetch(`http://127.0.0.1:8000/apipolls/booking/update/${booking_id}`, {
+        method: 'delete',
+        headers: {'Content-Type': 'application/json'},
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response;
+    })
+    .then(data => {
+        return data;
+    });
+}
+
+
 
 
 function closeModal(modalElement) {
