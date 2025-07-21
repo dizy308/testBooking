@@ -45,9 +45,21 @@ function fetchDataAPI(input_date){
             calculatePx(currentHourBlock,customer_name,start_time, end_time)
             
             currentHourBlock.addEventListener('click', () => {
-              popupBoxModify.classList.add('open-popup')
               document.querySelector('.calendar').classList.add('disabled');
               popupBoxModify.dataset.currentBookingID = elementBooked.booking_id;
+              
+              currentBookingData = elementBooked
+
+              popupBoxModify.classList.add('open-popup')
+              modifynameInput.value = customer_name;
+              modifystartTimeInput.value = convertToTime(start_time);
+              modifyendTimeInput.value = convertToTime(end_time);
+              
+              currentBookingData['court'] = current_court
+              currentBookingData['start_time'] = convertToTime(start_time)
+              currentBookingData['end_time'] = convertToTime(end_time)
+
+              delete currentBookingData.customer_id
 
             })
 
@@ -97,16 +109,21 @@ function fetchDataAPI(input_date){
   
   
 // ----------------------------------------------------------------------------------------------------------------------------------------- //
+let currentBookingData = null;
+
 const popupBoxBooking = document.querySelector('.popup-box-booking');
 const popupBoxModify = document.querySelector('.popup-box-modify');
 const confirmBooking = document.getElementById('confirm-booking');
 const confirmSchedule = document.querySelector('#confirm-schedule')
 const cancelSchedule = document.querySelector('#cancel-schedule')
 const deleteButton = document.querySelector('.delete-button')
+const modifyButton = document.querySelector('.modify-button')
 const closePopup = document.querySelector('.close-icon')
 
-
 const nameInput = document.querySelector("#fname")
+const modifynameInput = document.querySelector("#modifyname")
+const modifystartTimeInput = document.querySelector("#modifystarttime")
+const modifyendTimeInput = document.querySelector("#modifyendtime")
 const dateFilter = document.getElementById('date-filter');
 
 dateFilter.addEventListener('change', (e) => {
@@ -125,12 +142,11 @@ confirmBooking.addEventListener('click', () => {
           "start_time":convertToTime(item.start_time),
           "end_time":convertToTime(item.end_time),
           "court":item.court_id}
-          
-          console.log(dataFrag)
           receivedData.push(dataFrag)
         })
       }
     })
+
     if(receivedData.length === 0){
       alert('Please book a court')
     }
@@ -193,12 +209,41 @@ deleteButton.addEventListener('click', () => {
 
 })
 
+modifyButton.addEventListener('click', ()=>{
+  let currentDate = dateFilter.value
+
+  if (modifynameInput.value === '' && modifystartTimeInput.value === '' && modifyendTimeInput.value === ''){
+    currentBookingData['customer_num'] = 'STAFF'
+  }
+  else{
+    currentBookingData['customer_num'] = modifynameInput.value
+    currentBookingData['start_time'] = modifystartTimeInput.value
+    currentBookingData['end_time'] = modifyendTimeInput.value
+  }
+  currentBookingData['booking_date'] = currentDate
+
+  updateBookingRequest(currentBookingData)
+  .then(response => {
+
+    closeModal(popupBoxModify);
+    return fetchDataAPI(currentDate);
+  })
+  .catch(error => {
+    console.error("Update error:", error);
+    alert('Error updating booking: ' + error.message);
+  });
+
+})
+
+
+
 // ----------------------------------------------------------------------------------------------------------------------------------------- //
 // ----------------------------------------------------------------------------------------------------------------------------------------- //
 function convertToTime(inputTime){
 	const hour = parseInt(inputTime);
 	const minute = Math.round((inputTime % 1) * 60 ) ;
-	return `${hour}:${minute}`
+  
+	return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
 	}
 
 function createCourtBlock(courtCount, startHour, endHour){
@@ -256,7 +301,7 @@ function calculatePx(chosenObject, customerName,startHour, endHour){
     Object.assign(chosenObject.style, {
         left: `${startWidth}px`,
         width: `${currentDurationLength}px`,
-        backgroundColor: "#2cafe7",
+        backgroundColor: "#00cf77",
     });
 
     if(currentDuration >= 0.5){
@@ -345,8 +390,23 @@ function deleteBookingRequest(booking_id) {
     });
 }
 
-
-
+function updateBookingRequest(data) {
+    return fetch(`http://127.0.0.1:8000/apipolls/booking/update/${data.booking_id}`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const contentLength = response.headers.get('content-length');
+        if (contentLength === '0') {
+            return { status: response.status };
+        }
+        return response.json().catch(() => ({ status: response.status }));
+    });
+}
 
 function closeModal(modalElement) {
   modalElement.classList.remove('open-popup');
