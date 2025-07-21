@@ -43,7 +43,10 @@ function fetchDataAPI(input_date){
             
             calculatePx(currentHourBlock,customer_name,start_time, end_time)
             
-            currentHourBlock.addEventListener('click', () => {alert(`BookingID ${booking_id} from ${start_time} to ${end_time}`)})
+            currentHourBlock.addEventListener('click', () => {
+              popupBoxModify.classList.add('open-popup')
+              document.querySelector('.calendar').classList.add('disabled');
+            })
             
             chosenCourt.appendChild(currentHourBlock)
             
@@ -88,16 +91,22 @@ function fetchDataAPI(input_date){
       return Promise.reject(error);
     });
   }
+  
+  
+// ----------------------------------------------------------------------------------------------------------------------------------------- //
+const popupBoxBooking = document.querySelector('.popup-box-booking');
+const popupBoxModify = document.querySelector('.popup-box-modify');
+const confirmBooking = document.getElementById('confirm-booking');
+const confirmSchedule = document.querySelector('#confirm-schedule')
+const cancelSchedule = document.querySelector('#cancel-schedule')
+const closePopup = document.querySelector('.close-icon')
 
-
+const nameInput = document.querySelector("#fname")
 const dateFilter = document.getElementById('date-filter');
+
 dateFilter.addEventListener('change', (e) => {
   fetchDataAPI(e.target.value);
-
-});
-
-const popupBox = document.querySelector('.popup-box')
-const confirmBooking = document.getElementById('confirm-booking')
+  });
 
 let receivedData = []
 confirmBooking.addEventListener('click', () => {
@@ -107,56 +116,67 @@ confirmBooking.addEventListener('click', () => {
     else {
       const newValue = mergeAdjacentTimeSlots(value)
       newValue.forEach(item => {
-        dataFrag = {"booking_date": dateFilter.value, "customer_num":"STAFF",
-                    "start_time":convertToTime(item.start_time),
-                    "end_time":convertToTime(item.end_time),
-                    "court":item.court_id}
-
-        console.log(dataFrag)
-        receivedData.push(dataFrag)
-      })
+        dataFrag = {"booking_date": dateFilter.value, 
+          "start_time":convertToTime(item.start_time),
+          "end_time":convertToTime(item.end_time),
+          "court":item.court_id}
+          
+          console.log(dataFrag)
+          receivedData.push(dataFrag)
+        })
+      }
+    })
+    if(receivedData.length === 0){
+      alert('Please book a court')
     }
-  })
-  if(receivedData.length === 0){
-    alert('Please book a court')
-  }
-  else{
-    popupBox.classList.add('open-popup');
-    document.querySelector('.calendar').classList.add('disabled');
-    
-  }
-});
-
-
-const confirmSchedule = document.querySelector('#confirm-schedule')
-const cancelSchedule = document.querySelector('#cancel-schedule')
-
-confirmSchedule.addEventListener('click', ()=> {
-  let currentDate = dateFilter.value
-  popupBox.classList.remove('open-popup')
-  document.querySelector('.calendar').classList.remove('disabled');
-  
-  const bookingPromises = receivedData.map(item => sendBookingRequest(item));
-
-  Promise.all(bookingPromises)
-  .then(() => {
-    // setTimeout(() => fetchDataAPI(currentDate), 300);
-    fetchDataAPI(currentDate)
-  })
-  .catch(error => {
-    console.error('Booking failed:', error);
-    alert('Some bookings failed. Please try again.');
+    else{
+      popupBoxBooking.classList.add('open-popup');
+      document.querySelector('.calendar').classList.add('disabled');
+      
+    }
   });
+  
+confirmSchedule.addEventListener('click', ()=> {
+    let currentDate = dateFilter.value
+    popupBoxBooking.classList.remove('open-popup')
+    document.querySelector('.calendar').classList.remove('disabled');
+    
+    let postData = []
+    receivedData.forEach(item => {
+      if (nameInput.value === ""){
+        Object.assign(item, {'customer_num':"STAFF"})
+      }
+      else{
+        Object.assign(item, {'customer_num':nameInput.value})
+      }
+      postData.push(item)
+    })
+    
+    const bookingPromises = postData.map(item => sendBookingRequest(item));
 
-})
-
-cancelSchedule.addEventListener('click', ()=> {
-  popupBox.classList.remove('open-popup')
-  document.querySelector('.calendar').classList.remove('disabled');
-})
+    Promise.all(bookingPromises)
+    .then(() => {
+      fetchDataAPI(currentDate)
+    })
+    .catch(error => {
+      console.error('Booking failed:', error);
+      alert('Some bookings failed. Please try again.');
+    });
+    
+  })
+  
+cancelSchedule.addEventListener('click', () => closeModal(popupBoxBooking));
+closePopup.addEventListener('click', () => closeModal(popupBoxModify));
 
 
 // ----------------------------------------------------------------------------------------------------------------------------------------- //
+// ----------------------------------------------------------------------------------------------------------------------------------------- //
+function convertToTime(inputTime){
+	const hour = parseInt(inputTime);
+	const minute = Math.round((inputTime % 1) * 60 ) ;
+	return `${hour}:${minute}`
+	}
+
 function createCourtBlock(courtCount, startHour, endHour){
     const hourBars = document.querySelector('#hourBars');
     for (let i = 0; i <= courtCount; i++){
@@ -212,10 +232,12 @@ function calculatePx(chosenObject, customerName,startHour, endHour){
     Object.assign(chosenObject.style, {
         left: `${startWidth}px`,
         width: `${currentDurationLength}px`,
-        backgroundColor: "#ed6327",
+        backgroundColor: "#2cafe7",
     });
-    chosenObject.textContent = customerName
-    
+
+    if(currentDuration >= 0.5){
+      chosenObject.textContent = customerName
+    }
 }
 
 function calculatePxEmpty(chosenObject,startHour, endHour){
@@ -279,15 +301,14 @@ function sendBookingRequest(data) {
     })
     .then(data => {
         console.log('Success:', data);
-        return data; // Ensure the data propagates
+        return data;
     });
-    // Remove the catch here - let the caller handle errors
 }
 
-function convertToTime(inputTime){
-	let hour = parseInt(inputTime);
-	let minute = Math.round((inputTime % 1) * 60 ) ;
-	return `${hour}:${minute}`
-	}
+
+function closeModal(modalElement) {
+  modalElement.classList.remove('open-popup');
+  document.querySelector('.calendar').classList.remove('disabled');
+}
 
 // ----------------------------------------------------------------------------------------------------------------------------------------- //

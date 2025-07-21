@@ -43,7 +43,6 @@ class BookingRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = BookingSerializer
     lookup_field = "pk"
     
-    
 
 
 class BookingListCreate(generics.ListCreateAPIView):
