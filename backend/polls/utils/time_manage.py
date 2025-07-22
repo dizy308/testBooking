@@ -104,3 +104,5 @@ def find_free_slots_new(opening_time, closing_time, small_lines):
         blocks = calculate_block_new(slot[0], slot[1])
         uniform_blocks.extend(blocks)
     return uniform_blocks
+
+

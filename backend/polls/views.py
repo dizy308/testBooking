@@ -107,7 +107,7 @@ class BookingAvailabilityIntervalView (APIView):
 
         if not start_date_str or not end_date_str:
             return Response(
-                {"error": "court_id, start_date, and end_date are required."},
+                {"error": "start_date and end_date are required."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
