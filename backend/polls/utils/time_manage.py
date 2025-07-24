@@ -106,3 +106,21 @@ def find_free_slots_new(opening_time, closing_time, small_lines):
     return uniform_blocks
 
 
+def merge_intervals(intervals):
+    if not intervals:
+        return []
+    sorted_intervals = sorted(intervals, key=lambda x: x[0])
+    merged = [sorted_intervals[0]]
+    
+    for current in sorted_intervals[1:]:
+        last = merged[-1]
+        # If current interval overlaps with last merged interval
+        if current[0] <= last[1]:
+            # Merge them
+            new_start = last[0]
+            new_end = max(last[1], current[1])
+            merged[-1] = (new_start, new_end)
+        else:
+            merged.append(current)
+    
+    return merged

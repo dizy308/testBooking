@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Question, BookingInfo, CourtInfo
-from .utils.time_manage import calculate_block_new, find_free_slots_new
+from .utils.time_manage import *
 
 class QuestionSerializer(serializers.ModelSerializer):
     # actual_date = serializers.SerializerMethodField()
@@ -62,4 +62,6 @@ class FreeTimeSlotSerializer(serializers.Serializer):
 class FreeTimeSlotIntervalSerializer(serializers.Serializer):
     court_id = serializers.IntegerField()
     day_of_week = serializers.CharField()
-    free_time_block = serializers.ListField()
+    booked_slots = serializers.ListField()
+    merged_slots = serializers.ListField()
+    free_slots = serializers.ListField()

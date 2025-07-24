@@ -9,6 +9,7 @@ from polls.utils.time_manage import calculate_block_new
 
 from collections import defaultdict
 from functools import reduce
+from polls.utils.time_manage import find_free_slots_new, merge_intervals
 
 # 1. Set the correct settings module path
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cfghome.settings')
@@ -23,55 +24,42 @@ from polls.models import *
 
 
 start_date_str = '2025-07-01'
-end_date_str = '2025-07-10'
+end_date_str = '2025-07-15'
 
 courts = CourtInfo.objects.all()
-bookings = BookingInfo.objects.filter(
-            booking_date__gte = start_date_str,
-            booking_date__lte = end_date_str
-            ).select_related('court')\
-
-
-list_dow = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8']
+bookings = BookingInfo.objects.filter(booking_date__gte = start_date_str,booking_date__lte = end_date_str).select_related('court')\
 
 booked_slots = defaultdict(list) 
 booked_details = defaultdict(list)  
 for booking in bookings:
     time_interval = (float(booking.start_time_decimal), float(booking.end_time_decimal))
     booked_slots[(booking.day_of_week, booking.court_id)].append(time_interval)
+    
+    booked_details[(booking.day_of_week, booking.court_id)].append({
+        'booking_id': float(booking.id),
+        'play_date': booking.booking_date,
+        'start_time': float(booking.start_time_decimal),
+        'end_time': float(booking.end_time_decimal),
+        'customer_id': booking.customer_num
+    })
 
-# print(booked_slots)
 
-### Check overlap first --> If overlapped ---> min/max, else append non-overlapped
 
-def check_overlap(a,b):
-    if a[0] < b[1] and a[1] > b[0]:
-        return True
-    return False
-
-list_ = []
-def find_max(accumulator, current_value):
-    if check_overlap(accumulator, current_value):
-        start_temp = min(accumulator[0], current_value[0])
-        end_temp = max(accumulator[1], current_value[1])
-        accumulator = (start_temp, end_temp)
-
-    else:
-        list_.append(accumulator)
+list_dow = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8']
+total_slots = []
+for dow in list_dow:
+    for court in courts:
+        booked_list = booked_slots.get((dow,court.id),[])
+        start_time = float(court.start_hour)
+        end_time = float(court.end_hour)
+        merge_slots = merge_intervals(booked_list)
+        free_slot = find_free_slots_new(start_time, end_time, booked_list)
         
-    
-
-    return accumulator
-    
-
-test_array = [(7,8), (7,9),(7,10),(7.5,12), (15,18)]
-
-
-data = reduce(find_max, test_array)
-print(data)
-
-print(list_)
-
-
+        total_slots.append({
+            "court_id": court.id,
+            "dow": dow,
+            "booked_slot":booked_details[(dow,court.id)],
+            "free_slot": free_slot,
+            })
 
 
