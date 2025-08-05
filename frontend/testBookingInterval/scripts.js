@@ -39,7 +39,6 @@ function fetchData(){
             
             calculatePx(currentHourBlock, startHour = start_time, endHour = end_time)         
             chosenDOWCourt.appendChild(currentHourBlock)
-
             
           })}
         
@@ -65,7 +64,8 @@ function fetchData(){
                     clickedPosition = selectedSlots[current_court_name].findIndex(slot => slot.start_time === start_time_empty && slot.end_time === end_time_empty)
                     selectedSlots[current_court_name].splice(clickedPosition)
 
-                } else {
+                } 
+                else {
                     currentHourBlockEmpty.classList.add('selected-slot')
                     selectedSlots[current_court_name].push({
                             start_time: start_time_empty,
@@ -79,23 +79,59 @@ function fetchData(){
             
             chosenCourt_empty.appendChild(currentHourBlockEmpty);
 
-        })
-
-
-        }
-
+        })}
+    
         return Promise.all([job1(), job2()])
     }))
 }
 
 fetchData()
 
+// -------------------------------------------------------------------------------------------- //
+document.addEventListener("DOMContentLoaded", function() {
+    // Get the elements
+    const dateStart = document.getElementById('date-filter-start');
+    const dateEnd = document.getElementById('date-filter-end');
+
+    // Function to call your API or update your app
+    function onDateChange() {
+        const startDate = dateStart.value;
+        const endDate = dateEnd.value;
+        if (startDate && endDate){
+            if (new Date(startDate) <= new Date(endDate)){
+                console.log('Start:', startDate, 'End:', endDate);
+            }
+        }
+    }
+
+    // Add event listeners
+    dateStart.addEventListener('change', onDateChange);
+    dateEnd.addEventListener('change', onDateChange);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 
 // -------------------------------------------------------------------------------------------- //
-
 function createCourtBlockInterval(courtCount, startHour, endHour, dayOfWeek = 7) {
     const hourBars = document.querySelector('#hourBars');
     // Header row (unchanged)
