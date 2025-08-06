@@ -133,7 +133,7 @@ dateFilter.addEventListener('change', (e) => {
 let receivedData = []
 confirmBooking.addEventListener('click', () => {
   receivedData = []
-
+  console.log(selectedSlots)
   Object.entries(selectedSlots).forEach(([key,value]) => {
     if (value.length === 0){}
     else {
