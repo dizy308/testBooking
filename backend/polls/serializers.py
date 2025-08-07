@@ -65,3 +65,5 @@ class FreeTimeSlotIntervalSerializer(serializers.Serializer):
     booked_slots = serializers.ListField()
     merged_slots = serializers.ListField()
     free_slots = serializers.ListField()
+
+

@@ -1,11 +1,4 @@
-const startCalendar = 6
-const endCalendar  = 23
-createCourtBlockInterval(5,startCalendar,endCalendar);
-
-
-
 const selectedSlots = {};
-
 function fetchData(startDateInput, endDateInput){
     const url = `http://127.0.0.1:8000/apipolls/booking/freeslotinterval?start_date=${startDateInput}&end_date=${endDateInput}`
     fetch(url)
@@ -46,69 +39,76 @@ function fetchData(startDateInput, endDateInput){
         
         const job2 = () =>{
             empty_slots.forEach((emptySlot, idx) =>{
-                    const chosenCourt_empty = document.querySelector(`.hour-bar-block.${current_dow} > .courts-container > #court_num_${current_court} > .duration-container`)
-                    const start_time_empty = emptySlot[0]
-                    const end_time_empty = emptySlot[1]
-                    
-                    namedPositionEmpty = `duration-sub-block-empty ${start_time_empty}-${end_time_empty}`
-                    const currentHourBlockEmpty = document.createElement('div')
-                    const compositeKey = `${current_dow}-${current_court_name}`;
-                    
-                    currentHourBlockEmpty.className = namedPositionEmpty
-                    calculatePxEmpty(currentHourBlockEmpty,start_time_empty, end_time_empty)
+                const chosenCourt_empty = document.querySelector(`.hour-bar-block.${current_dow} > .courts-container > #court_num_${current_court} > .duration-container`)
+                const start_time_empty = emptySlot[0]
+                const end_time_empty = emptySlot[1]
+                
+                namedPositionEmpty = `duration-sub-block-empty ${start_time_empty}-${end_time_empty}`
+                const currentHourBlockEmpty = document.createElement('div')
+                const compositeKey = `${current_dow}-${current_court_name}`;
+                
+                currentHourBlockEmpty.className = namedPositionEmpty
+                calculatePx(currentHourBlockEmpty,startHour = start_time_empty, endHour = end_time_empty, calculateType="empty")
 
-                    currentHourBlockEmpty.addEventListener('click', () => {
-                        if (!selectedSlots[compositeKey]) {selectedSlots[compositeKey] = []}
+                currentHourBlockEmpty.addEventListener('click', () => {
+                    if (!selectedSlots[compositeKey]) {selectedSlots[compositeKey] = []}
+                    
+                    if (currentHourBlockEmpty.classList.contains('selected-slot')) {
+                        currentHourBlockEmpty.classList.remove('selected-slot')
                         
-                        // Toggle selected state
-                        if (currentHourBlockEmpty.classList.contains('selected-slot')) {
-                            currentHourBlockEmpty.classList.remove('selected-slot')
-                            
-                            clickedPosition = selectedSlots[compositeKey].findIndex(slot => slot.start_time === start_time_empty && slot.end_time === end_time_empty)
-                            selectedSlots[compositeKey].splice(clickedPosition)
-                        } 
-                        else {
-                            currentHourBlockEmpty.classList.add('selected-slot')
-                            if (dateStart.value <= dateEnd.value){
-                                let pushedData = {
-                                        start_date: dateStart.value,
-                                        end_date: dateEnd.value,
-                                        start_time: start_time_empty,
-                                        end_time: end_time_empty,
-                                        court_id: current_court,
-                                        dow: current_dow
-                                    }
-                                selectedSlots[compositeKey].push(pushedData)
-                            }
-                            }
+                        clickedPosition = selectedSlots[compositeKey].findIndex(slot => slot.start_time === start_time_empty && slot.end_time === end_time_empty)
+                        selectedSlots[compositeKey].splice(clickedPosition)
+                    } 
+                    else {
+                        currentHourBlockEmpty.classList.add('selected-slot')
+                        if (dateStart.value <= dateEnd.value){
+                            let pushedData = {
+                                    start_date: dateStart.value,
+                                    end_date: dateEnd.value,
+                                    start_time: start_time_empty,
+                                    end_time: end_time_empty,
+                                    court_id: current_court,
+                                    dow: current_dow
+                                }
+                            selectedSlots[compositeKey].push(pushedData)
+                        }
+                        }
                     })
             chosenCourt_empty.appendChild(currentHourBlockEmpty);
 
         })}
     
         return Promise.all([job1(), job2()])
+
     }))
 }
 
 
 
 // -------------------------------------------------------------------------------------------- //
-const confirmBooking = document.getElementById('confirm-booking');
+const startCalendar = 6
+const endCalendar  = 23
+const hourBars = document.querySelector('#hourBars');
 const dateStart = document.getElementById('date-filter-start');
 const dateEnd = document.getElementById('date-filter-end');
+const confirmBooking = document.getElementById('confirm-booking');
+const inputData = hourBars.querySelector('.input-data');
 
-// Function to call your API or update your app
+createHeader(startCalendar, endCalendar)
+createCourtBlockInterval(5,startCalendar,endCalendar);
+
 function onDateChange() {
         const startDate = dateStart.value;
         const endDate = dateEnd.value;
         if (startDate && endDate){
             if (new Date(startDate) <= new Date(endDate)){
+                createCourtBlockInterval(5,startCalendar,endCalendar)
+
                 fetchData(startDate,endDate)
             }
         }
 }
 
-// Add event listeners
 dateStart.addEventListener('change', onDateChange);
 dateEnd.addEventListener('change', onDateChange);
 
@@ -141,7 +141,6 @@ confirmBooking.addEventListener('click', () => {
     }
     else{
         console.log(receivedData)
-      
     }
   });
 
@@ -156,9 +155,8 @@ function convertToTime(inputTime){
 	return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
 	}
 
-function createCourtBlockInterval(courtCount, startHour, endHour, dayOfWeek = 7) {
-    const hourBars = document.querySelector('#hourBars');
-    // Header row (unchanged)
+
+function createHeader(startHour, endHour){
     const header = document.createElement('div');
     const courtNum = document.createElement('div');
     const dowNum = document.createElement('div');
@@ -179,9 +177,22 @@ function createCourtBlockInterval(courtCount, startHour, endHour, dayOfWeek = 7)
         header.append(hourBlock);
     }
     hourBars.append(header);
+}
 
+
+function createCourtBlockInterval(courtCount, startHour, endHour, dayOfWeek = 7) {
+    const existingCalendarSection = document.querySelector('.calendar-section');
+    if (existingCalendarSection) {
+        existingCalendarSection.remove();
+    }
+
+
+    const calendarSection = document.createElement('div');
+    calendarSection.className = `calendar-section`
     // ---------------------------------------------------- //
-    for (let p = 0; p < dayOfWeek; p++) {
+    let arrDOW = calculateDaysBetween(dateStart.value, dateEnd.value)
+
+    arrDOW.forEach(p => {
         const dowBlock = document.createElement('div');
         dowBlock.className = `hour-bar-block T${p + 2}`;
 
@@ -225,74 +236,84 @@ function createCourtBlockInterval(courtCount, startHour, endHour, dayOfWeek = 7)
         }
 
         dowBlock.append(dowNum, courtsContainer);
-        hourBars.appendChild(dowBlock);
+        calendarSection.append(dowBlock)
+        hourBars.append(calendarSection);
     }
+
+    ) 
+}
+
+function calculateDaysBetween(startDate, endDate) {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  if (start > end) return [];
+
+  const totalDays = Math.floor((end - start) / 86400000) + 1;
+  if (totalDays > 7) return [0, 1, 2, 3, 4, 5, 6];
+
+  const days = [];
+  const current = new Date(start);
+  for (let i = 0; i < totalDays; i++) {
+    const day = (current.getDay() + 6) % 7;
+    if (!days.includes(day)){
+        days.push(day)
+    }
+    current.setDate(current.getDate() + 1);
+  }
+  return days.sort();
 }
 
 
+
+
 function mergeAdjacentTimeSlots(timeSlots) {
-    const sortedTimeSlots = timeSlots.sort((a, b) => {
-        return a.start_time - b.start_time;
-    });
-  return sortedTimeSlots.reduce((accumulator, currentValue) => {
-  const previousValue = accumulator[accumulator.length - 1];
+    const sortedTimeSlots = timeSlots.sort((a, b) => a.start_time - b.start_time);
+    return sortedTimeSlots.reduce((accumulator, currentValue) => {
+    const previousValue = accumulator[accumulator.length - 1];
     
-  if (previousValue !== undefined && previousValue.end_time === currentValue.start_time) {
+    if (previousValue !== undefined && previousValue.end_time === currentValue.start_time) {
       const mergedSlot = {
         start_time: previousValue.start_time,
         end_time: currentValue.end_time,
         court_id: currentValue.court_id,
-        dow: currentValue.dow,
-      };
-      accumulator.pop();
-      return accumulator.concat(mergedSlot);
-    } else {
-      // Add the current time slot as is
-      return accumulator.concat({
+        dow: currentValue.dow
+    }
+    accumulator.pop();
+    return accumulator.concat(mergedSlot)} 
+    else {
+    return accumulator.concat({
         start_time: currentValue.start_time,
         end_time: currentValue.end_time,
         court_id: currentValue.court_id,
         dow: currentValue.dow
-      });
-    }
-  }, []);
+      })
+    }}, [])
 }
 
 
-
-
-function calculatePx(chosenObject,startHour, endHour, customerName=""){
+function calculatePx(chosenObject,startHour, endHour, calculateType){
     const currentCourt = document.querySelector(".hour-container")
     const pxPerDuration = currentCourt.offsetWidth / (60 * (endCalendar - startCalendar))
     const startWidth = (startHour - startCalendar) * 60 * pxPerDuration + currentCourt.offsetLeft
 
     const currentDuration = endHour - startHour
     const currentDurationLength = (currentDuration * 60 * pxPerDuration)
-    
-    Object.assign(chosenObject.style, {
-        left: `${startWidth}px`,
-        width: `${currentDurationLength}px`,
-        backgroundColor: "rgba(255, 95, 31, 0.8)",
-    });
 
-    if(currentDuration >= 0.5){
-      chosenObject.textContent = customerName
+    if (calculateType === 'empty'){
+        Object.assign(chosenObject.style, {
+            left: `${startWidth}px`,
+            width: `${currentDurationLength}px`
+        });  
+    }
+    else{
+        Object.assign(chosenObject.style, {
+            left: `${startWidth}px`,
+            width: `${currentDurationLength}px`,
+            backgroundColor: "rgba(255, 95, 31, 0.8)",
+        })
     }
 }
 
 
-function calculatePxEmpty(chosenObject,startHour, endHour){
-    const currentCourt = document.querySelector(".hour-container")
-    const pxPerDuration = currentCourt.offsetWidth / (60 * (endCalendar - startCalendar))
-    const startWidth = (startHour - startCalendar) * 60 * pxPerDuration + currentCourt.offsetLeft
-
-    const currentDuration = endHour - startHour
-    const currentDurationLength = (currentDuration * 60 * pxPerDuration)
-    
-    Object.assign(chosenObject.style, {
-        left: `${startWidth}px`,
-        width: `${currentDurationLength}px`
-    });  
-}
 
 

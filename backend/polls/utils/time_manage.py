@@ -1,6 +1,6 @@
 import math
 from datetime import datetime
-
+import numpy as np
 
 class TimeManage:
     def __init__(self, opening, closing, interval):
@@ -124,3 +124,13 @@ def merge_intervals(intervals):
             merged.append(current)
     
     return merged
+
+
+def get_days_of_week_between(start_date, end_date):
+    list_weekdays = []
+    days = np.arange(np.datetime64(start_date), np.datetime64(end_date) + 1).astype('datetime64[D]')
+    weekdays = (days.astype('datetime64[D]').view('int64') - 4) % 7
+    for value in weekdays:
+        list_weekdays.append(f'T{value+2}')
+        
+    return sorted(list_weekdays)

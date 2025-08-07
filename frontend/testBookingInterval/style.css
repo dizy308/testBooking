@@ -68,9 +68,16 @@ html {
     background-color: white;
     width: 60px;
     height: 30px;
-    color: green;
+    
     font-weight: bold;
     font-size: 70%;
+}
+
+.time-interval{
+    color: blueviolet;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .day-of-week, .court-number{

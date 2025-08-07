@@ -128,7 +128,7 @@ class BookingAvailabilityIntervalView (APIView):
             })
 
 
-        list_dow = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8']
+        list_dow = get_days_of_week_between(start_date_str, end_date_str)
         total_slots = []
         for dow in list_dow:
             for court in courts:
