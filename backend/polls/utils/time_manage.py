@@ -133,4 +133,4 @@ def get_days_of_week_between(start_date, end_date):
     for value in weekdays:
         list_weekdays.append(f'T{value+2}')
         
-    return sorted(list_weekdays)
+    return sorted(set(list_weekdays))
