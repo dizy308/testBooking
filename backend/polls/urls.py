@@ -12,6 +12,7 @@ urlpatterns = [
     path("booking/", views.BookingListCreate.as_view(), name= "booking-createlist"),
     path("booking/freeslot", views.BookingAvailabilityView.as_view(), name= "booking-freeslot"),
     path("booking/freeslotinterval", views.BookingAvailabilityIntervalView.as_view(), name= "booking-freeslot-interval"),
+    path("booking/intervalbooking", views.CreateIntervalBooking.as_view(), name= "booking-interval"),
     
     
     path("booking/update/<int:pk>", views.BookingRetrieveUpdateDestroy.as_view(), name= "booking-update"),

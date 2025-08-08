@@ -83,8 +83,6 @@ function fetchData(startDateInput, endDateInput){
     }))
 }
 
-
-
 // -------------------------------------------------------------------------------------------- //
 const startCalendar = 6
 const endCalendar  = 23
@@ -97,13 +95,14 @@ const inputData = hourBars.querySelector('.input-data');
 createHeader(startCalendar, endCalendar)
 createCourtBlockInterval(5,startCalendar,endCalendar);
 
+
+
 function onDateChange() {
-        const startDate = dateStart.value;
-        const endDate = dateEnd.value;
+    const startDate = dateStart.value;
+    const endDate = dateEnd.value;
         if (startDate && endDate){
             if (new Date(startDate) <= new Date(endDate)){
                 createCourtBlockInterval(5,startCalendar,endCalendar)
-
                 fetchData(startDate,endDate)
             }
         }
@@ -112,7 +111,6 @@ function onDateChange() {
 dateStart.addEventListener('change', onDateChange);
 dateEnd.addEventListener('change', onDateChange);
 
-receivedData = []
 confirmBooking.addEventListener('click', () => {
   let receivedData = []
 
@@ -130,7 +128,6 @@ confirmBooking.addEventListener('click', () => {
             "end_time":convertToTime(item.end_time),
             "dow":item.dow,
             "court":item.court_id}
-        
           receivedData.push(dataFrag)
         })
       }
@@ -141,6 +138,16 @@ confirmBooking.addEventListener('click', () => {
     }
     else{
         console.log(receivedData)
+        const bookingPromises = sendBookingRequestInterval(receivedData)
+
+        bookingPromises
+            .then(() => {
+                fetchData(dateStart.value,dateEnd.value)
+            })
+            .catch(error => {
+                console.error('Booking failed:', error);
+                alert('Some bookings failed. Please try again.');
+            });
     }
   });
 
@@ -314,6 +321,21 @@ function calculatePx(chosenObject,startHour, endHour, calculateType){
     }
 }
 
-
+function sendBookingRequestInterval(data) {
+    return fetch('http://127.0.0.1:8000/apipolls/booking/intervalbooking', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({bookings: data})
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        return data;
+    });
+}
 
 

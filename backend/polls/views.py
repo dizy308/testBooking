@@ -50,9 +50,6 @@ class BookingListCreate(generics.ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['booking_date']
 
-    # @transaction.atomic
-    # def create(self, request, *args, **kwargs):
-    #     return super().create(request, *args, **kwargs)
 
     def get_serializer_class(self):
         if self.request.method == "GET":
@@ -150,4 +147,5 @@ class BookingAvailabilityIntervalView (APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     
-    
+class CreateIntervalBooking(generics.CreateAPIView):
+    serializer_class = BulkBookingSerializer

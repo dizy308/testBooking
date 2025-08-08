@@ -1,5 +1,5 @@
 import math
-from datetime import datetime
+from datetime import datetime, timedelta
 import numpy as np
 
 class TimeManage:
@@ -134,3 +134,16 @@ def get_days_of_week_between(start_date, end_date):
         list_weekdays.append(f'T{value+2}')
         
     return sorted(set(list_weekdays))
+
+
+def generate_list_dates(start_date, end_date, selected_dow):
+    current_date = start_date
+    list_days = []
+    while current_date <= end_date:
+        current_dow = f'T{current_date.weekday() + 2}'
+        if current_dow == selected_dow:
+            list_days.append(current_date.strftime('%Y-%m-%d'))
+            
+        current_date = current_date + timedelta(days = 1)
+    
+    return list_days
