@@ -40,21 +40,23 @@ class CourtRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
 
 class BookingRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = BookingInfo.objects.all()
-    serializer_class = BookingSerializer
+    serializer_class = BookingListSerializer
     lookup_field = "pk"
     
 
 
-class BookingListCreate(generics.ListCreateAPIView):
+class BookingListView(generics.ListAPIView):
     queryset = BookingInfo.objects.all()
+    serializer_class = BookingListSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['booking_date']
 
 
-    def get_serializer_class(self):
-        if self.request.method == "GET":
-            return BookingListSerializer
-        return BookingSerializer
+class BookingCreateView(generics.CreateAPIView):
+    queryset = BookingInfo.objects.all()
+    serializer_class = BookingSerializer
+
+
 ## -------------------------------------------------------------------------- ##
     
 class BookingAvailabilityView(APIView):
@@ -97,7 +99,7 @@ class BookingAvailabilityView(APIView):
 
 
 
-class BookingAvailabilityIntervalView (APIView):
+class BookingAvailabilityIntervalView(APIView):
     def get(self, request, *args, **kwargs):
         start_date_str = request.query_params.get('start_date')
         end_date_str = request.query_params.get('end_date')
@@ -147,5 +149,5 @@ class BookingAvailabilityIntervalView (APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     
-class CreateIntervalBooking(generics.CreateAPIView):
+class BookingIntervalCreateView(generics.CreateAPIView):
     serializer_class = BulkBookingSerializer

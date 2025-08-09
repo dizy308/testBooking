@@ -133,23 +133,25 @@ confirmBooking.addEventListener('click', () => {
       }
     })
 
-    if(receivedData.length === 0){
+    if (receivedData.length === 0){
       alert('Please book a court')
     }
-    else{
+    else {
         console.log(receivedData)
         const bookingPromises = sendBookingRequestInterval(receivedData)
 
         bookingPromises
             .then(() => {
-                fetchData(dateStart.value,dateEnd.value)
             })
             .catch(error => {
-                console.error('Booking failed:', error);
-                alert('Some bookings failed. Please try again.');
-            });
+                console.error('Booking failed:', error)
+                alert('Some bookings failed. Please try again.')
+            })
+            .finally(() => {
+                fetchData(dateStart.value,dateEnd.value)
+            })
     }
-  });
+  })
 
 
 

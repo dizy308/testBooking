@@ -28,25 +28,37 @@ class QuestionSerializer(serializers.ModelSerializer):
             
         return data
 
-
-class BookingSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BookingInfo
-        fields = [f.name for f in model._meta.fields] 
-
-class BookingListSerializer(serializers.ModelSerializer):
-    courtName = serializers.SerializerMethodField()
-    class Meta:
-        model = BookingInfo
-        fields = ['id', 'booking_date','customer_num', 'start_time_decimal','end_time_decimal', 'courtName'] 
-        
-    def get_courtName(self, data):
-        return 'court_' + str(data.court_id)
-
 class CourtSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourtInfo
         fields = [f.name for f in model._meta.fields] 
+
+class BookingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BookingInfo
+        fields = [f.name for f in model._meta.fields]
+    
+    def validate(self, data):
+        start_decimal = data['start_time'].hour + data['start_time'].minute / 60
+        end_decimal = data['end_time'].hour + data['end_time'].minute / 60
+
+        conflict_exists = BookingInfo.objects.filter(
+            court=data['court'],
+            booking_date=data['booking_date'],
+            start_time_decimal__lt=end_decimal,
+            end_time_decimal__gt=start_decimal
+        ).exists()
+
+        if conflict_exists:
+            raise serializers.ValidationError(
+                f"Conflict: Court {data['court']} is already booked on that time"
+            )
+        return data
+
+class BookingListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BookingInfo
+        fields = [f.name for f in model._meta.fields]       
 
 class FreeTimeSlotSerializer(serializers.Serializer):
     court_id = serializers.IntegerField()

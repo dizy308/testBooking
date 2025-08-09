@@ -147,13 +147,12 @@ confirmBooking.addEventListener('click', () => {
         })
       }
     })
-
     if(receivedData.length === 0){
       alert('Please book a court')
     }
     else{
-      popupBoxBooking.classList.add('open-popup');
-      document.querySelector('.calendar').classList.add('disabled');
+      popupBoxBooking.classList.add('open-popup')
+      document.querySelector('.calendar').classList.add('disabled')
       
     }
   });
@@ -161,7 +160,7 @@ confirmBooking.addEventListener('click', () => {
 confirmSchedule.addEventListener('click', ()=> {
     let currentDate = dateFilter.value
     popupBoxBooking.classList.remove('open-popup')
-    document.querySelector('.calendar').classList.remove('disabled');
+    document.querySelector('.calendar').classList.remove('disabled')
     
     let postData = []
     receivedData.forEach(item => {
@@ -178,18 +177,20 @@ confirmSchedule.addEventListener('click', ()=> {
 
     Promise.all(bookingPromises)
     .then(() => {
-      fetchDataAPI(currentDate)
+      alert('Successfully booked all booking')
     })
     .catch(error => {
-      console.error('Booking failed:', error);
-      alert('Some bookings failed. Please try again.');
-    });
+      console.error('Booking failed:', error)
+      alert('Some bookings failed. Please try again.')
+    })
+    .finally(() =>{
+      fetchDataAPI(currentDate)
+    })
     
   })
   
 cancelSchedule.addEventListener('click', () => closeModal(popupBoxBooking));
 closePopup.addEventListener('click', () => closeModal(popupBoxModify));
-
 
 deleteButton.addEventListener('click', () => {
   const bookingId = popupBoxModify.dataset.currentBookingID;
@@ -198,15 +199,18 @@ deleteButton.addEventListener('click', () => {
   deleteBookingRequest(bookingId)
   .then(response => {
     if (response.ok) {
-      closeModal(popupBoxModify);
-      return fetchDataAPI(currentDate);
-    } else {
+      closeModal(popupBoxModify)
+    } 
+    else {
       alert('Failed to delete booking.');
     }
   })
   .catch(error => {
     alert('Error deleting booking: ' + error);
-  });
+  })
+  .finally(() =>{
+    fetchDataAPI(currentDate)
+  })
 
 })
 
@@ -225,14 +229,16 @@ modifyButton.addEventListener('click', ()=>{
 
   updateBookingRequest(currentBookingData)
   .then(response => {
-
-    closeModal(popupBoxModify);
-    return fetchDataAPI(currentDate);
+      console.log(response)
+      closeModal(popupBoxModify)
   })
   .catch(error => {
-    console.error("Update error:", error);
-    alert('Error updating booking: ' + error.message);
-  });
+    console.error("Update error:", error)
+    alert('Error updating booking: ' + error.message)
+  })
+  .finally(() =>{
+    fetchDataAPI(currentDate)
+  })
 
 })
 
@@ -324,13 +330,6 @@ function calculatePxEmpty(chosenObject,startHour, endHour){
     });  
 }
 
-function isOverlapping(booking1, booking2) {
-    const result = Number(booking1.start_time) < Number(booking2.end_time) 
-                  && Number(booking2.start_time) < Number(booking1.end_time)
-                
-    return result;
-}
-
 
 function mergeAdjacentTimeSlots(timeSlots) {
   const sortedTimeSlots = timeSlots.sort((a, b) => a.start_time - b.start_time);
@@ -358,7 +357,7 @@ function mergeAdjacentTimeSlots(timeSlots) {
 
 
 function sendBookingRequest(data) {
-    return fetch('http://127.0.0.1:8000/apipolls/booking/', {
+    return fetch('http://127.0.0.1:8000/apipolls/booking/intradaybooking', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
