@@ -135,6 +135,7 @@ confirmBooking.addEventListener('click', () => {
 
     if (receivedData.length === 0){
       alert('Please book a court')
+      fetchData(dateStart.value,dateEnd.value)
     }
     else {
         console.log(receivedData)

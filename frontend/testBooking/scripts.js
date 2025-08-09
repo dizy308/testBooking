@@ -148,6 +148,7 @@ confirmBooking.addEventListener('click', () => {
       }
     })
     if(receivedData.length === 0){
+      fetchDataAPI(dateFilter.value)
       alert('Please book a court')
     }
     else{
@@ -158,7 +159,6 @@ confirmBooking.addEventListener('click', () => {
   });
   
 confirmSchedule.addEventListener('click', ()=> {
-    let currentDate = dateFilter.value
     popupBoxBooking.classList.remove('open-popup')
     document.querySelector('.calendar').classList.remove('disabled')
     
@@ -184,7 +184,7 @@ confirmSchedule.addEventListener('click', ()=> {
       alert('Some bookings failed. Please try again.')
     })
     .finally(() =>{
-      fetchDataAPI(currentDate)
+      fetchDataAPI(dateFilter.value)
     })
     
   })
