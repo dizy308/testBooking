@@ -9,22 +9,21 @@ from polls.utils.time_manage import calculate_block_new
 
 from collections import defaultdict
 from functools import reduce
-from polls.utils.time_manage import find_free_slots_new, merge_intervals
+from polls.utils.time_manage import find_free_slots_new, merge_intervals, get_days_of_week_between
 
 # 1. Set the correct settings module path
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cfghome.settings')
 
 # 2. Setup Django
 django.setup()
-
-
 from polls.models import *
 
 
 
+start_date_str = '2025-08-01'
+end_date_str = '2025-08-01'
 
-start_date_str = '2025-07-01'
-end_date_str = '2025-07-15'
+
 
 courts = CourtInfo.objects.all()
 bookings = BookingInfo.objects.filter(booking_date__gte = start_date_str,booking_date__lte = end_date_str).select_related('court')\
@@ -44,22 +43,32 @@ for booking in bookings:
     })
 
 
-
-list_dow = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8']
+list_dow = get_days_of_week_between(start_date_str, end_date_str)
 total_slots = []
 for dow in list_dow:
     for court in courts:
         booked_list = booked_slots.get((dow,court.id),[])
         start_time = float(court.start_hour)
         end_time = float(court.end_hour)
-        merge_slots = merge_intervals(booked_list)
-        free_slot = find_free_slots_new(start_time, end_time, booked_list)
+        merged_slots = merge_intervals(booked_list)
+        free_slots = find_free_slots_new(start_time, end_time, booked_list)
         
+        current_bookings = booked_details[(dow, court.id)]
+        for slot in merged_slots:
+            start_slot = slot[0]
+            end_slot = slot[1]
+            for b in booked_details[(dow,court.id)]:
+                if max(b['start_time'], start_slot) <= min(end_slot, b['end_time']):
+                    b['merged_slots'] = (start_slot, end_slot)
+
         total_slots.append({
             "court_id": court.id,
-            "dow": dow,
-            "booked_slot":booked_details[(dow,court.id)],
-            "free_slot": free_slot,
+            "day_of_week": dow,
+            "booked_slots":booked_details[(dow,court.id)],
+            "merged_slots":merged_slots,
+            "free_slots": free_slots,
             })
 
 
+for value in total_slots:
+    print(value['booked_slots'])
