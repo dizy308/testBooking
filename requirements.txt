@@ -1,0 +1,6 @@
+django
+numpy
+djangorestframework
+pyyaml
+requests
+django-cors-headers

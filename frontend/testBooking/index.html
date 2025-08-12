@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+    <link rel="stylesheet" href="styleReset.css">
+    <link rel="stylesheet" href="style.css">
+    <title>Document</title>
+</head>
+<body>
+
+    <div class="container">
+        <div class="calendar">
+            <div class="hour-bars" id="hourBars">
+                <div class="input-data" >
+                    <input type="date" id="date-filter"">
+                    <button id="confirm-booking">CONFIRM SCHEDULE</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="popup-box-booking">
+            <div class="input-group">
+                <label for="fname">Customer Name:</label>
+                <input type="text" id="fname" name="fname">
+            </div>
+
+            <div class="button-area">
+                <button id="cancel-schedule" class="cancel-button">CANCEL SCHEDULE</button>
+                <button id="confirm-schedule">CONFIRM SCHEDULE</button>
+
+            </div>
+        </div>
+
+        <div class="popup-box-modify">
+            <span class="close-icon">
+                <svg width="24" height="24" viewBox="0 0 512 512">
+                    <path d="M256 48C141.1 48 48 141.1 48 256s93.1 208 208 208 208-93.1 208-208S370.9 48 256 48zm80 272.9L328.9 336 256 263.1 183.1 336 176 328.9 248.9 256 176 183.1 183.1 176 256 248.9 328.9 176 336 183.1 263.1 256 336 328.9z"/>
+                </svg>
+            </span>
+            <div class="input-group">
+                <label for="modifyname">Customer Name:</label>
+                <input type="text" id="modifyname" name="modifyname">
+
+                <label for="modifystarttime">StartTime:</label>
+                <input type="time" id="modifystarttime" name="modifystarttime">
+
+                <label for="modifyendtime">EndTime:</label>
+                <input type="time" id="modifyendtime" name="modifyendtime">
+            </div>
+
+            <div class="button-area">
+                <button class="delete-button">DELETE SCHEDULE</button>
+                <button class="modify-button">MODIFY SCHEDULE</button>
+            </div>
+        </div>
+
+    </div>
+
+
+        
+    <script src="scripts.js"></script>
+</body>
+</html>

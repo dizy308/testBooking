@@ -1,0 +1,214 @@
+html {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+  user-select: none;
+}
+
+
+.container {
+    width: 100%; 
+    min-height: 100vh;
+    background-color: #e6f8ef;
+    gap:30px;
+    overflow: auto; 
+
+}
+
+.calendar {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    
+}
+.calendar.disabled {
+    pointer-events: none;
+}
+
+#hourBars {
+    margin-top:70px;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    gap: 5px;
+}
+
+.court-block, .hour-container{
+    display:flex;
+    position:relative;
+}
+
+
+.court-number, .time-interval, .hour-sub-block {
+    border: 1px solid #ccc;
+    background-color: white;
+    width: 60px;
+    height: 30px;
+    color: green;
+    font-weight: bold;
+    font-size: 70%;
+}
+
+
+.court-number{
+    color: red;
+    font-weight: bold;
+}
+
+.duration-container {
+    height: 100%;
+}
+
+.duration-sub-block{
+    height: 100%;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    color:white;
+    font-weight: bold;
+    font-size: 12px;
+    z-index: 1;
+    border:1px solid #789086;
+    
+}
+
+.duration-sub-block.overlap-block {
+    background-color: red !important; 
+}
+
+.duration-sub-block-empty {
+    height: 100%;
+    position: absolute;
+    z-index: 1;
+ }
+
+.selected-slot {
+    background-color: rgba(255, 255, 0, 0.5); 
+}
+
+
+.input-data{
+    width: 100%;
+    margin-bottom: 30px;
+    text-align: left;
+    position: relative;
+}
+
+
+.container-popup{
+    width: 100%;
+    height: 100vh;
+    background-color: #3c5077;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#confirm-booking{
+    position: absolute;
+    height: 100%;
+    top: 0px;
+    right: 0px;
+    background-color: green;
+    border: 0px;
+    outline: none;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+
+/* POP UP BOX AREA */
+.popup-box-booking, .popup-box-modify  {
+    width: 300px;
+    height: 300px;
+    padding: 25px;
+    background: #e8f5e9;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: fixed;
+
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: Arial, sans-serif;
+    visibility: hidden;
+    z-index: 1;
+}
+
+
+.open-popup{
+    visibility: visible;
+}
+
+.input-group, .info-card {
+    margin-bottom: 10px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.button-area {
+    display: flex;
+    gap: 12px;
+}
+
+.button-area button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#confirm-schedule {
+    background: #2e8b57;
+    color: white;
+}
+
+#cancel-schedule {
+    background: #f5f5f5;
+    color: #555;
+    border: 1px solid #ddd !important;
+}
+
+.popup-box-modify .close-icon{
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: white;
+    font-size: 2em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+
+.delete-button{
+    background-color: red;
+    color: white;
+}
