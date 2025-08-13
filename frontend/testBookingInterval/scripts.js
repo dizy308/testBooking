@@ -28,19 +28,23 @@ function fetchData(startDateInput, endDateInput){
             const currentPos = `.hour-bar-block.${current_dow} > .courts-container > #court_num_${current_court} > .duration-container`
             const chosenDOWCourt = document.querySelector(currentPos);
 
-            const start_time = elementBooked.start_time
-            const end_time = elementBooked.end_time
-            const indexPosition = start_time
+            const start_time = elementBooked.start_time_merged
+            const end_time = elementBooked.end_time_merged
 
             let namedPosition = `duration-sub-block ${start_time}-${end_time}`
             const currentHourBlock = document.createElement('div')
 
             currentHourBlock.className = namedPosition
             
-            local_ff.calculatePx(currentHourBlock, {startHour:start_time, endHour:end_time, startCalendar:startCalendar, endCalendar:endCalendar})         
+            local_ff.calculatePx(currentHourBlock, {startHour:start_time, endHour:end_time, startCalendar:startCalendar, endCalendar:endCalendar})  
             chosenDOWCourt.appendChild(currentHourBlock)
             
-          })}
+            currentHourBlock.addEventListener('click', () => {
+                const filteredData = booked_slots.filter(slot => slot.start_time_merged === start_time)
+                console.log(filteredData)
+            })
+          })
+        }
         
         const job2 = () =>{
             empty_slots.forEach((emptySlot, idx) =>{

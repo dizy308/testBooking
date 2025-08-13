@@ -137,11 +137,18 @@ class BookingAvailabilityIntervalView(APIView):
                 merged_slots = merge_intervals(booked_list)
                 free_slots = find_free_slots_new(start_time, end_time, booked_list)
                 
+                for start_slot, end_slot in merged_slots:
+                    for b in booked_details[(dow,court.id)]:
+                        if max(b['start_time'], start_slot) <= min(end_slot, b['end_time']):
+                            b['start_time_merged'] = start_slot
+                            b['end_time_merged'] = end_slot
+
+                
                 total_slots.append({
                     "court_id": court.id,
                     "day_of_week": dow,
                     "booked_slots":booked_details[(dow,court.id)],
-                    "merged_slots":merged_slots,
+                    # "merged_slots":merged_slots,
                     "free_slots": free_slots,
                     })
 

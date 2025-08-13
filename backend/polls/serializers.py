@@ -69,7 +69,7 @@ class FreeTimeSlotIntervalSerializer(serializers.Serializer):
     court_id = serializers.IntegerField()
     day_of_week = serializers.CharField()
     booked_slots = serializers.ListField()
-    merged_slots = serializers.ListField()
+    # merged_slots = serializers.ListField()
     free_slots = serializers.ListField()
 
 

@@ -54,12 +54,11 @@ for dow in list_dow:
         free_slots = find_free_slots_new(start_time, end_time, booked_list)
         
         current_bookings = booked_details[(dow, court.id)]
-        for slot in merged_slots:
-            start_slot = slot[0]
-            end_slot = slot[1]
+        for start_slot, end_slot in merged_slots:
             for b in booked_details[(dow,court.id)]:
                 if max(b['start_time'], start_slot) <= min(end_slot, b['end_time']):
-                    b['merged_slots'] = (start_slot, end_slot)
+                    b['start_time_merged'] = start_slot
+                    b['end_time_merged'] = end_slot
 
         total_slots.append({
             "court_id": court.id,

@@ -35,7 +35,6 @@ function fetchDataAPI(input_date){
             const end_time = elementBooked.end_time
             const customer_name = elementBooked.customer_id
             const booking_id = elementBooked.booking_id
-            const indexPosition = start_time
 
             namedPosition = `duration-sub-block ${start_time}-${end_time}`
             const currentHourBlock = document.createElement('div')
