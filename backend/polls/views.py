@@ -40,7 +40,7 @@ class CourtRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
 
 class BookingRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = BookingInfo.objects.all()
-    serializer_class = BookingListSerializer
+    serializer_class = BookingSerializer
     lookup_field = "pk"
     
 

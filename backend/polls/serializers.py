@@ -39,15 +39,20 @@ class BookingSerializer(serializers.ModelSerializer):
         fields = [f.name for f in model._meta.fields]
     
     def validate(self, data):
+        instance = self.instance
         start_decimal = data['start_time'].hour + data['start_time'].minute / 60
         end_decimal = data['end_time'].hour + data['end_time'].minute / 60
 
-        conflict_exists = BookingInfo.objects.filter(
+        conflict_query = BookingInfo.objects.filter(
             court=data['court'],
             booking_date=data['booking_date'],
             start_time_decimal__lt=end_decimal,
             end_time_decimal__gt=start_decimal
-        ).exists()
+        )
+        if instance is not None:
+            conflict_query = conflict_query.exclude(pk=instance.pk)
+
+        conflict_exists = conflict_query.exists()
 
         if conflict_exists:
             raise serializers.ValidationError(
