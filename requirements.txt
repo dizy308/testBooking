@@ -5,3 +5,4 @@ pyyaml
 requests
 django-cors-headers
 django-filter
+gunicorn
